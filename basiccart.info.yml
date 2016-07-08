@@ -1,0 +1,10 @@
+name: 'Basic Cart'
+description: 'Provides basic cart functionalities.'
+package: 'Basic Cart'
+type: module
+core: 8.x
+
+dependencies:
+  - field
+
+configure: basiccart.settings

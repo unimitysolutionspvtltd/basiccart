@@ -1,0 +1,34 @@
+<?php
+use Drupal\field\Entity\FieldConfig;
+use Drupal\field\Entity\FieldStorageConfig;
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
+
+
+function basiccart_theme($existing, $type, $theme, $path) {
+  return array(
+    'basiccart_cart_template' => array(
+      'variables' => array('basiccart' => NULL),
+    ),
+  );
+}
+
+
+/**
+ * Implements hook_ENTITY_TYPE_view() for node entities.
+ */
+function basiccart_node_view(array &$build, EntityInterface $node, EntityViewDisplayInterface $display, $view_mode) {
+  global $base_url;
+}
+
+
+function basiccart_page_attachments(array &$page) {
+  $page['#attached']['library'][] = 'basiccart/basiccart';
+}
+
+
+
+
+
+
