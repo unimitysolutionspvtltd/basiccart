@@ -1,4 +1,4 @@
-# basic_cart
+# Basic Cart
 
 Basic cart is a very simple shopping cart / checkout process for Drupal, that just sends 2 emails after each order. Along with the shopping cart, this module also provides a block where you can view your cart's content. It's ideal for small websites with only a few products or other content types being sold, for example touristic offers.
 
