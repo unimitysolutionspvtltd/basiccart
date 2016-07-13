@@ -53,9 +53,9 @@ class AddToCartWithQuantity extends FormBase {
       '#type' => 'submit',
       '#value' => t($config->get('add_to_cart_button')),
     );
-    //unset($_SESSION['basiccart']);
     return $form;
   }
+
   /**
    * {@inheritdoc}
    */
@@ -69,5 +69,5 @@ class AddToCartWithQuantity extends FormBase {
     Utility::add_to_cart($id, $params);
   }
 
-
 }
+

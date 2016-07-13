@@ -4,18 +4,29 @@ basiccart.cart:
   _controller: '\Drupal\basiccart\Controller\CartController::cart'
   _title_callback: '\Drupal\basiccart\Controller\CartController::getCartPageTitle'
  requirements:
-  _permission: 'access content'
+  _access: 'TRUE'
 basiccart.cartremove:
  path: '/cart/remove/{nid}'
  defaults:
   _controller: '\Drupal\basiccart\Controller\CartController::remove_from_cart'
   _title_callback: '\Drupal\basiccart\Controller\CartController::getCartPageTitle'
  requirements:
-  _permission: 'access content'
+  _access: 'TRUE'
  options:
   parameters:
    nid:
-    with_config_overrides: TRUE    
+    with_config_overrides: TRUE
+basiccart.cartadd:
+ path: '/cart/add/{nid}'
+ defaults:
+  _controller: '\Drupal\basiccart\Controller\CartController::add_to_cart'
+  _title_callback: '\Drupal\basiccart\Controller\CartController::getCartPageTitle'
+ requirements:
+  _access: 'TRUE'
+ options:
+  parameters:
+   nid:
+    with_config_overrides: TRUE            
 basiccart.settings:
  path: 'admin/config/basiccart'
  defaults:

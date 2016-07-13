@@ -78,9 +78,10 @@ else {
         </div>';
         }
       $url = new Url('basiccart.cart');
-      $link = new Link($this->t($config->get('view_cart_button')),$url);
+      //$link = new Link($this->t($config->get('view_cart_button')),$url);
+      $link = "<a href='".$url->toString()."' class='button'>".$this->t($config->get('view_cart_button'))."</a>";
         $output .='<div class="basiccart-cart-checkout-button basiccart-cart-checkout-button-block row">
-        '.$link->toString().'
+        '.$link.'
       </div>';
 	}
 	$output .= '</div>';

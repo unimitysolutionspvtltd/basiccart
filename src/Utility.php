@@ -19,8 +19,6 @@ class Utility {
  */
 public static function _price_format() {
   $config = self::cart_settings();
-  //print $this->$config; die;
- // print_r(self::get_fields_config()); die;
   $currency = $config->get('currency');
   return array(
     0 => t('1 234,00 @currency', array('@currency' => $currency)),
@@ -74,11 +72,11 @@ public static function get_total_price() {
     'total' => 0,
   );
   $cart = self::get_cart();
-//print_r($cart); die;
+
   if (empty($cart)) {
     return (object) $return;
   }
- // unset( $_SESSION['basic_cart']['cart'][11]); die;
+
   $total_price = 0;
   foreach ($cart['cart'] as $nid => $node) {
      $langcode = $node->language()->getId();
@@ -187,8 +185,8 @@ public static function price_format($price) {
 
 
   public static function  cart_settings() {
-      $return = \Drupal::config('basiccart.settings');
-      return $return;
+    $return = \Drupal::config('basiccart.settings');
+    return $return;
   }
 
   public static function add_to_cart($id, $params = array()) {
@@ -197,6 +195,7 @@ public static function price_format($price) {
       $quantity = $params['quantity'];
       $entitytype = $params['entitytype'];
       $quantity = $params['quantity'];
+
       if ($id > 0 && $quantity > 0) {
             // If a node is added more times, just update the quantity.
             $cart = self::get_cart();
@@ -208,62 +207,69 @@ public static function price_format($price) {
                $entity = \Drupal::entityTypeManager()->getStorage($entitytype)->load($id);
                $_SESSION['basiccart']['cart'][$id] = $entity;
                $_SESSION['basiccart']['cart_quantity'][$id] = $quantity;
-
             }
       }
       self::cart_updated_message();
     }  
   }
 
-/**
- * Returns the fields we need to create.
- * 
- * @return mixed
- *   Key / Value pair of field name => field type. 
- */
-public static function  get_fields_config() {
+  /**
+   * Returns the fields we need to create.
+   * 
+   * @return mixed
+   *   Key / Value pair of field name => field type. 
+   */
+  public static function  get_fields_config() {
 
-  $config = Utility::cart_settings();
-  return (object) array('bundle_types' => $config->get('content_type'),
-                    "fields" => array(
-                    'add_to_cart_price' => array(
-                      'type' => 'decimal',
-                      'entity_type' => 'node',
-                      'title' => t($config->get('price_label')),
-                      'label' => t($config->get('price_label')),
-                      'required' => FALSE,
-                      'description' => t('Please enter this item\'s price.'),
-                      'widget' => array('type' => 'number'),
-                      'formatter' => array('default'=> array(
-                              'label' => 'inline',
-                              'type' => 'number_decimal',
-                              'weight' => 10,
-                            ), 'search_result' =>  'default','teaser' => 'default') 
-                    ),
-                    'add_to_cart' => array(
-                      'type' => 'addtocart',
-                      'entity_type' => 'node',
-                      'title' => t($config->get('add_to_cart_button')),
-                      'label' => t($config->get('add_to_cart_button')),
-                      'required' => FALSE,
-                      'description' => '',
-                      'widget' => array('type' => 'addtocart'),
-                      'formatter' => array('default'=> array(
-                              'label' => 'hidden',
-                              'weight' => 11,
-                              'type' => $config->get('quantity_status') ? 'addtocartwithquantity' : 'addtocart',
-                            ), 'search_result' =>  'default','teaser' => 'default') 
+    $config = Utility::cart_settings();
+    return (object) array('bundle_types' => $config->get('content_type'),
+                      "fields" => array(
+                      'add_to_cart_price' => array(
+                        'type' => 'decimal',
+                        'entity_type' => 'node',
+                        'title' => t($config->get('price_label')),
+                        'label' => t($config->get('price_label')),
+                        'required' => FALSE,
+                        'description' => t('Please enter this item\'s price.'),
+                        'widget' => array('type' => 'number'),
+                        'formatter' => array('default'=> array(
+                                'label' => 'inline',
+                                'type' => 'number_decimal',
+                                'weight' => 10,
+                              ), /*'search_result' =>  'default',*/ 'teaser' => 'default') 
+                      ),
+                      'add_to_cart' => array(
+                        'type' => 'addtocart',
+                        'entity_type' => 'node',
+                        'title' => t($config->get('add_to_cart_button')),
+                        'label' => t($config->get('add_to_cart_button')),
+                        'required' => FALSE,
+                        'description' => '',
+                        'widget' => array('type' => 'addtocart'),
+                        'formatter' => array('default'=> array(
+                                'label' => 'hidden',
+                                'weight' => 11,
+                                'type' => $config->get('quantity_status') ? 'addtocartwithquantity' : 'addtocart',
+                              ), 'search_result' =>  array(
+                                'label' => 'hidden',
+                                'weight' => 11,
+                                'type' => 'addtocartsearch',
+                              ), 'teaser' => array(
+                                'label' => 'hidden',
+                                'weight' => 11,
+                                'type' => 'addtocartsearch',
+                              ),) 
 
-                    ), 
-                    ),
-                );
-}
+                      ), 
+                      ),
+                  );
+  }
 
   public static function create_fields() {
-   $fields = self::get_fields_config();
-   $view_modes = \Drupal::entityManager()->getViewModes('node');
+    $fields = self::get_fields_config();
+    $view_modes = \Drupal::entityManager()->getViewModes('node');
 
-   foreach($fields->fields as $field_name => $config) {
+    foreach($fields->fields as $field_name => $config) {
      $field_storage = FieldStorageConfig::loadByName($config['entity_type'], $field_name);
      if(empty($field_storage)) {
         FieldStorageConfig::create(array(
@@ -272,7 +278,7 @@ public static function  get_fields_config() {
             'type' => $config['type'],
           ))->save();
      }
-   }
+    }
 
     foreach($fields->bundle_types as  $bundle) {
       foreach ($fields->fields as $field_name => $config) {
@@ -310,10 +316,10 @@ public static function  get_fields_config() {
     }
   } 
 
-public static function cart_updated_message() {
-   $config = Utility::cart_settings();
-  drupal_set_message(t($config->get('cart_updated_message')));
- }
+  public static function cart_updated_message() {
+    $config = Utility::cart_settings();
+    drupal_set_message(t($config->get('cart_updated_message')));
+  }
 }
 
  

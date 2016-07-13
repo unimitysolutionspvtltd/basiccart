@@ -56,5 +56,5 @@ class AddToCart extends FormBase {
    Utility::add_to_cart($id, $params);
   }
 
-
 }
+
