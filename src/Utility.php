@@ -9,7 +9,10 @@ use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 
 class Utility {
-  
+
+  const FIELD_ADDTOCART    = 'addtocart';
+  const FIELD_ORDERCONNECT = 'orderconnect';
+
 
 /**
  * Returns the available price formats.
@@ -219,11 +222,37 @@ public static function price_format($price) {
    * @return mixed
    *   Key / Value pair of field name => field type. 
    */
-  public static function  get_fields_config() {
+  public static function  get_fields_config($type = null) {
 
     $config = Utility::cart_settings();
-    return (object) array('bundle_types' => $config->get('content_type'),
-                      "fields" => array(
+    $field['bundle_types'] = $config->get('content_type');
+    if($type == self::FIELD_ORDERCONNECT) {
+      $bundles = array();
+      foreach ($field['bundle_types'] as $key => $value) {
+        if($value){
+          $bundles[$key] = $key;
+        }
+      }
+     $fields['bundle_types'] = array('basiccart_connect' =>  'basiccart_connect'); 
+     $fields['fields'] =  array(
+                      'basiccart_contentoconnect' => array(
+                        'type' => 'entity_reference',
+                        'entity_type' => 'node',
+                        'bundle' => 'basiccart_connect',
+                        'title' => t('Basic Cart Content Connect'),
+                        'label' => t('Basic Cart Content Connect'),
+                        'required' => FALSE,
+                        'description' => t('Basic Cart content connect'),
+                        'settings' => array('handler' => 'default:node',
+                                            'handler_settings'=> array(
+                                                  "target_bundles" =>  $bundles,
+                                              ) 
+                                            )
+
+                          ),);
+    }
+    else {
+     $fields['fields'] =  array(
                       'add_to_cart_price' => array(
                         'type' => 'decimal',
                         'entity_type' => 'node',
@@ -261,13 +290,17 @@ public static function price_format($price) {
                               ),) 
 
                       ), 
-                      ),
-                  );
+                      );
+                 
+    }
+    return (object) $fields;
   }
 
-  public static function create_fields() {
-    $fields = self::get_fields_config();
+  public static function create_fields($type = null) {
+
+    $fields = ($type == self::FIELD_ORDERCONNECT) ? self::get_fields_config(self::FIELD_ORDERCONNECT) : self::get_fields_config();
     $view_modes = \Drupal::entityManager()->getViewModes('node');
+    //print_r($fields); die;
 
     foreach($fields->fields as $field_name => $config) {
      $field_storage = FieldStorageConfig::loadByName($config['entity_type'], $field_name);
@@ -282,16 +315,21 @@ public static function price_format($price) {
 
     foreach($fields->bundle_types as  $bundle) {
       foreach ($fields->fields as $field_name => $config) {
-
-        $field = FieldConfig::loadByName($config['entity_type'], $bundle, $field_name);
-        if(empty($field) && $bundle !== "" && !empty($bundle)) {
-                     FieldConfig::create(array(
+        $config_array = array(
                 'field_name' =>  $field_name,
                 'entity_type' => $config['entity_type'],
                 'bundle' => $bundle,
                 'label' => $config['label'],
                 'required' => $config['required'],
-              ))->save();
+                
+              );
+
+        if(isset($config['settings'])) {
+          $config_array['settings'] = $config['settings'];
+        }
+        $field = FieldConfig::loadByName($config['entity_type'], $bundle, $field_name);
+        if(empty($field) && $bundle !== "" && !empty($bundle)) {
+                FieldConfig::create($config_array)->save();
         }
 
         if($bundle !== "" && !empty($bundle)) {
@@ -299,19 +337,21 @@ public static function price_format($price) {
              $field->setLabel($config['label'])->save();
              $field->setRequired($config['required'])->save();
           }
-
-            entity_get_form_display($config['entity_type'], $bundle, 'default')
-            ->setComponent($field_name, $config['widget'])
-            ->save();
-
-           foreach ($config['formatter'] as $view => $formatter) {
-              if (isset($view_modes[$view]) || $view == "default") { 
-                 entity_get_display($config['entity_type'], $bundle, $view)
-                ->setComponent($field_name, !is_array($formatter) ? $config['formatter']['default'] : $formatter)
-                ->save();
-              }  
-           } 
-        }  
+           if($config['widget']) {
+              entity_get_form_display($config['entity_type'], $bundle, 'default')
+              ->setComponent($field_name, $config['widget'])
+              ->save();
+           }
+           if($config['formatter']) {  
+             foreach ($config['formatter'] as $view => $formatter) {
+                if (isset($view_modes[$view]) || $view == "default") { 
+                   entity_get_display($config['entity_type'], $bundle, $view)
+                  ->setComponent($field_name, !is_array($formatter) ? $config['formatter']['default'] : $formatter)
+                  ->save();
+                }  
+             } 
+          } 
+        } 
       }
     }
   } 
@@ -319,6 +359,10 @@ public static function price_format($price) {
   public static function cart_updated_message() {
     $config = Utility::cart_settings();
     drupal_set_message(t($config->get('cart_updated_message')));
+  }
+
+  public static function order_connect_fields() {
+    self::create_fields(self::FIELD_ORDERCONNECT);
   }
 }
 
