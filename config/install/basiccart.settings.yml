@@ -18,5 +18,5 @@ vat_value: 0
 add_to_cart_button : Add to cart
 add_to_cart_redirect: home
 content_type: { }
-
+order_status: 0
 

@@ -6,5 +6,6 @@ core: 8.x
 
 dependencies:
   - field
+  - telephone
 
 configure: basiccart.settings

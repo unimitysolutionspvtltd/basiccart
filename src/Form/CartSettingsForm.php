@@ -42,7 +42,7 @@ class CartSettingsForm extends ConfigFormBase {
     $options = array();
     $default_value = array();
     foreach ($node_types as $node_type => $type) {
-      if ($node_type == 'order' && module_exists('basic_cart_order')) {
+      if ($node_type == 'basiccart_order' || $node_type == 'basiccart_connect' ) {
         continue;
       }
     $options[$node_type] = $type->get('name');
@@ -134,6 +134,17 @@ class CartSettingsForm extends ConfigFormBase {
     '#field_suffix' => '%',
     '#size' => 10,
     '#default_value' => $config->get('vat_value'),
+    );
+
+    $form['order'] = array(
+    '#title' => t('Basic Cart Order'),
+    '#type' => 'fieldset',
+    );
+
+    $form['order']['basiccart_order_status'] = array(
+    '#title' => t('Check if you want to create order for the cart.'),
+    '#type' => 'checkbox',
+    '#default_value' => $config->get('order_status'),
     );
 
     $form['redirect'] = array(
@@ -256,8 +267,11 @@ class CartSettingsForm extends ConfigFormBase {
       ->set('add_to_cart_button',$form_state->getValue('basiccart_add_to_cart_button'))
       ->set('add_to_cart_redirect',$form_state->getValue('basiccart_add_to_cart_redirect'))            
       ->set('content_type',$form_state->getValue('basiccart_content_types'))
+      ->set('order_status',$form_state->getValue('basiccart_order_status'))
       ->save();
     Utility::create_fields();
+    Utility::order_connect_fields();
+    // To save enabled content types not from settings 
     foreach($form_state->getValue('basiccart_content_types') as $key => $value){
      $content_types[$key] = $value ? $value : $content_types[$key];
     }
