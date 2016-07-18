@@ -270,7 +270,7 @@ class CartSettingsForm extends ConfigFormBase {
       ->set('order_status',$form_state->getValue('basiccart_order_status'))
       ->save();
     Utility::create_fields();
-    Utility::order_connect_fields();
+    //Utility::order_connect_fields();
     // To save enabled content types not from settings 
     foreach($form_state->getValue('basiccart_content_types') as $key => $value){
      $content_types[$key] = $value ? $value : $content_types[$key];
