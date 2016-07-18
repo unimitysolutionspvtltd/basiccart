@@ -4,6 +4,8 @@ use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
+use Drupal\basiccart\OrderConnectStorage;
+use Drupal\basiccart\Utility;
 
 
 function basiccart_theme($existing, $type, $theme, $path) {
@@ -27,8 +29,42 @@ function basiccart_page_attachments(array &$page) {
   $page['#attached']['library'][] = 'basiccart/basiccart';
 }
 
+function basiccart_node_insert(EntityInterface $node) {
+
+    $utility = new Utility();
+    $get_cart = $utility::get_cart();
+    $cart     = $get_cart['cart'];
+    $nid   = $node->id();
+    $order = new OrderConnectStorage();
+
+    $utility = new Utility();
+   /* $get_price = $utility::get_total_price();
+   // $node = node_load($node->id);
+    $node->set('basiccart_total_price',$get_price->total);
+    $node->set('basiccart_vat',$get_price->vat);
+    $node->save(); */
+    foreach ($cart  as $key => $value) {
+      $params['oid'] = $nid;
+      $params['id']  = $key;
+      $params['entitytype']  = $value->bundle();
+      $params['quantity']  = $get_cart['cart_quantity'][$key];
+      $order->insert($params);
+    }
+
+   $utility::empty_cart();
+}
 
 
+function basiccart_form_alter(&$form,FormStateInterface $form_state, $form_id) {
 
+}
+
+function basiccart_node_presave(NodeInterface $node) {
+   /* $utility = new Utility();
+    $get_price = $utility::get_total_price();
+    print_r($get_price->); die; */
+
+    //$node->save();
+}
 
 

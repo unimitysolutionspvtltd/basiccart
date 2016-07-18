@@ -225,14 +225,15 @@ public static function price_format($price) {
   public static function  get_fields_config($type = null) {
 
     $config = Utility::cart_settings();
-    $field['bundle_types'] = $config->get('content_type');
-    if($type == self::FIELD_ORDERCONNECT) {
-      $bundles = array();
-      foreach ($field['bundle_types'] as $key => $value) {
+    $fields['bundle_types'] = $config->get('content_type');
+      foreach ($config->get('content_type') as $key => $value) {
         if($value){
           $bundles[$key] = $key;
         }
       }
+    $fields['bundle_types'] = $bundles;
+    if($type == self::FIELD_ORDERCONNECT) {
+
      $fields['bundle_types'] = array('basiccart_connect' =>  'basiccart_connect'); 
      $fields['fields'] =  array(
                       'basiccart_contentoconnect' => array(
@@ -264,7 +265,7 @@ public static function price_format($price) {
                         'formatter' => array('default'=> array(
                                 'label' => 'inline',
                                 'type' => 'number_decimal',
-                                'weight' => 10,
+                                'weight' => 11,
                               ), /*'search_result' =>  'default',*/ 'teaser' => 'default') 
                       ),
                       'add_to_cart' => array(
@@ -300,8 +301,6 @@ public static function price_format($price) {
 
     $fields = ($type == self::FIELD_ORDERCONNECT) ? self::get_fields_config(self::FIELD_ORDERCONNECT) : self::get_fields_config();
     $view_modes = \Drupal::entityManager()->getViewModes('node');
-    //print_r($fields); die;
-
     foreach($fields->fields as $field_name => $config) {
      $field_storage = FieldStorageConfig::loadByName($config['entity_type'], $field_name);
      if(empty($field_storage)) {
@@ -312,7 +311,6 @@ public static function price_format($price) {
           ))->save();
      }
     }
-
     foreach($fields->bundle_types as  $bundle) {
       foreach ($fields->fields as $field_name => $config) {
         $config_array = array(
