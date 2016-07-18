@@ -54,7 +54,21 @@ class CartController extends ControllerBase
     $param['quantity'] = $query->get('quantity') ? $query->get('quantity') : 1;
     Utility::add_to_cart($nid, $param);
     return new RedirectResponse(Url::fromUri($_SERVER['HTTP_REFERER'])->toString());  
-  }  
+  }
+
+    public function checkout() {
+      $type = node_type_load("basiccart_order"); 
+        $node = $this->entityManager()->getStorage('node')->create(array(
+          'type' => $type->id(),
+        ));
+
+        $node_create_form = $this->entityFormBuilder()->getForm($node);  
+ 
+        return array(
+            '#type' => 'markup',
+            '#markup' => render($node_create_form),
+        );
+   }    
   
 }
   

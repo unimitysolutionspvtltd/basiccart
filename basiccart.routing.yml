@@ -5,6 +5,13 @@ basiccart.cart:
   _title_callback: '\Drupal\basiccart\Controller\CartController::getCartPageTitle'
  requirements:
   _access: 'TRUE'
+basiccart.checkout:
+ path: '/checkout'
+ defaults:
+  _controller: '\Drupal\basiccart\Controller\CartController::checkout'
+  _title_callback: '\Drupal\basiccart\Controller\CartController::getCartPageTitle'
+ requirements:
+  _access: 'TRUE'  
 basiccart.cartremove:
  path: '/cart/remove/{nid}'
  defaults:
