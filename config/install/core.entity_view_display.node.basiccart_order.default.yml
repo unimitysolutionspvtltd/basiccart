@@ -2,14 +2,14 @@ langcode: en
 status: true
 dependencies:
   config:
-    - field.field.node.basiccart_order.field_basiccart_address
-    - field.field.node.basiccart_order.field_basiccart_city
-    - field.field.node.basiccart_order.field_basiccart_email
-    - field.field.node.basiccart_order.field_basiccart_message
-    - field.field.node.basiccart_order.field_basiccart_phone
-    - field.field.node.basiccart_order.field_basiccart_total_price
-    - field.field.node.basiccart_order.field_basiccart_vat
-    - field.field.node.basiccart_order.field_basiccart_zipcode
+    - field.field.node.basiccart_order.basiccart_address
+    - field.field.node.basiccart_order.basiccart_city
+    - field.field.node.basiccart_order.basiccart_email
+    - field.field.node.basiccart_order.basiccart_message
+    - field.field.node.basiccart_order.basiccart_phone
+    - field.field.node.basiccart_order.basiccart_total_price
+    - field.field.node.basiccart_order.basiccart_vat
+    - field.field.node.basiccart_order.basiccart_zipcode
     - node.type.basiccart_order
   module:
     - telephone
@@ -19,40 +19,40 @@ targetEntityType: node
 bundle: basiccart_order
 mode: default
 content:
-  field_basiccart_address:
+  basiccart_address:
     weight: 3
     label: above
     settings:
       link_to_entity: false
     third_party_settings: {  }
     type: string
-  field_basiccart_city:
+  basiccart_city:
     weight: 4
     label: above
     settings:
       link_to_entity: false
     third_party_settings: {  }
     type: string
-  field_basiccart_email:
+  basiccart_email:
     weight: 0
     label: above
     settings: {  }
     third_party_settings: {  }
     type: basic_string
-  field_basiccart_message:
+  basiccart_message:
     weight: 1
     label: above
     settings: {  }
     third_party_settings: {  }
     type: basic_string
-  field_basiccart_phone:
+  basiccart_phone:
     weight: 2
     label: above
     settings:
       title: ''
     third_party_settings: {  }
     type: telephone_link
-  field_basiccart_total_price:
+  basiccart_total_price:
     weight: 6
     label: above
     settings:
@@ -62,7 +62,7 @@ content:
       prefix_suffix: true
     third_party_settings: {  }
     type: number_decimal
-  field_basiccart_vat:
+  basiccart_vat:
     weight: 7
     label: above
     settings:
@@ -72,7 +72,7 @@ content:
       prefix_suffix: true
     third_party_settings: {  }
     type: number_decimal
-  field_basiccart_zipcode:
+  basiccart_zipcode:
     weight: 5
     label: above
     settings:
