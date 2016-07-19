@@ -34,18 +34,32 @@ basiccart.cartadd:
   parameters:
    nid:
     with_config_overrides: TRUE            
-basiccart.settings:
- path: 'admin/config/basiccart'
- defaults:
-  _form: '\Drupal\basiccart\Form\CartSettingsForm'
-  _title: 'Basic Cart Settings'
- requirements:
-  _permission: 'basiccart admin_cart'
 basiccart.create_direct_order:
  path: '/node/add/basiccart_order'
  defaults:
   _controller: '\Drupal\basiccart\Controller\CartController::order_create'
   _title: 'Create Order'
  requirements:
-  _permission: 'basiccart create_direct_orders' 
+  _permission: 'basiccart create_direct_orders'
+basiccart.admin:
+ path: 'admin/config/basiccart'
+ defaults:
+  _form: '\Drupal\basiccart\Form\CartSettingsForm'
+  _title: 'Basic Cart Settings'
+ requirements:
+  _permission: 'basiccart admin_cart'
+basiccart.settings:
+ path: 'admin/config/basiccart/settings'
+ defaults:
+  _form: '\Drupal\basiccart\Form\CartSettingsForm'
+  _title: 'Basic Cart Settings'
+ requirements:
+  _permission: 'basiccart admin_cart'
+basiccart.checkout_settings:
+ path: 'admin/config/basiccart/checkout'
+ defaults:
+  _form: '\Drupal\basiccart\Form\CheckOutSettingsForm'
+  _title: 'Basic Cart Settings'
+ requirements:
+  _permission: 'basiccart admin_cart'       
 
