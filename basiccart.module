@@ -29,42 +29,60 @@ function basiccart_page_attachments(array &$page) {
   $page['#attached']['library'][] = 'basiccart/basiccart';
 }
 
-function basiccart_node_insert(EntityInterface $node) {
-
-    $utility = new Utility();
+function basiccart_entity_insert(EntityInterface $node) {
+   $utility = new Utility();
+  if($utility::is_basiccart_order($node->bundle())) {
     $get_cart = $utility::get_cart();
     $cart     = $get_cart['cart'];
     $nid   = $node->id();
     $order = new OrderConnectStorage();
-
-    $utility = new Utility();
-   /* $get_price = $utility::get_total_price();
-   // $node = node_load($node->id);
-    $node->set('basiccart_total_price',$get_price->total);
-    $node->set('basiccart_vat',$get_price->vat);
-    $node->save(); */
     foreach ($cart  as $key => $value) {
       $params['oid'] = $nid;
       $params['id']  = $key;
-      $params['entitytype']  = $value->bundle();
+      $params['entitytype']  = $value->getEntityTypeId();
       $params['quantity']  = $get_cart['cart_quantity'][$key];
       $order->insert($params);
     }
-
    $utility::empty_cart();
+  } 
 }
 
 
 function basiccart_form_alter(&$form,FormStateInterface $form_state, $form_id) {
+   $form_ids = array('node_basiccart_order_edit_form', 'node_basiccart_order_form' );
+   if(in_array($form_id,$form_ids)) {
+      $form['title']['widget'][0]['value']['#title'] = t('Name');
 
+      unset($form['basiccart_vat']);
+      unset($form['basiccart_total_price']);
+      $form['actions']['submit']['#value'] = t('Place Order');
+   }
 }
 
-function basiccart_node_presave(NodeInterface $node) {
-   /* $utility = new Utility();
+function basiccart_entity_presave(EntityInterface $node) {
+   $utility = new Utility();
+  if($utility::is_basiccart_order($node->bundle())) {
     $get_price = $utility::get_total_price();
-    print_r($get_price->); die; */
-
-    //$node->save();
+     $bundle = $node->bundle();
+    if(empty($node->id())) {
+      $node->set('basiccart_vat', $get_price->vat);
+      $node->set('basiccart_total_price', $get_price->total);
+    }
+  }  
 }
 
+function basiccart_entity_delete(EntityInterface $node) {
+   $utility = new Utility();
+  if($utility::is_basiccart_order($node->bundle())) {
+    $entitytype = $node->getEntityTypeId();
+    $id = $node->id();
+    $bundle = $node->bundle();
+    if(isset($entitytype) && isset($id)){
+       $params['oid'] = $id;
+       $params['entitytype'] = $entitytype;  
+       $order = new OrderConnectStorage();
+       $order->order_delete($params);
+    }
+  } 
+}
 

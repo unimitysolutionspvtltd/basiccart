@@ -4,21 +4,21 @@ basiccart.cart:
   _controller: '\Drupal\basiccart\Controller\CartController::cart'
   _title_callback: '\Drupal\basiccart\Controller\CartController::getCartPageTitle'
  requirements:
-  _access: 'TRUE'
+  _permission: 'basiccart use_cart'
 basiccart.checkout:
  path: '/checkout'
  defaults:
   _controller: '\Drupal\basiccart\Controller\CartController::checkout'
-  _title_callback: '\Drupal\basiccart\Controller\CartController::getCartPageTitle'
+  _title: 'Create Order'
  requirements:
-  _access: 'TRUE'  
+  _permission: 'basiccart use_cart'
 basiccart.cartremove:
  path: '/cart/remove/{nid}'
  defaults:
   _controller: '\Drupal\basiccart\Controller\CartController::remove_from_cart'
   _title_callback: '\Drupal\basiccart\Controller\CartController::getCartPageTitle'
  requirements:
-  _access: 'TRUE'
+  _permission: 'basiccart use_cart'
  options:
   parameters:
    nid:
@@ -29,7 +29,7 @@ basiccart.cartadd:
   _controller: '\Drupal\basiccart\Controller\CartController::add_to_cart'
   _title_callback: '\Drupal\basiccart\Controller\CartController::getCartPageTitle'
  requirements:
-  _access: 'TRUE'
+  _permission: 'basiccart use_cart'
  options:
   parameters:
    nid:
@@ -40,6 +40,12 @@ basiccart.settings:
   _form: '\Drupal\basiccart\Form\CartSettingsForm'
   _title: 'Basic Cart Settings'
  requirements:
-  _permission: 'administer site configuration'
-
+  _permission: 'basiccart admin_cart'
+basiccart.create_direct_order:
+ path: '/node/add/basiccart_order'
+ defaults:
+  _controller: '\Drupal\basiccart\Controller\CartController::order_create'
+  _title: 'Create Order'
+ requirements:
+  _permission: 'basiccart create_direct_orders' 
 

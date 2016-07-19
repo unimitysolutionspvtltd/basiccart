@@ -65,6 +65,9 @@ basiccart.settings:
    sequence:
     type: string
     label: 'Content type'
+  order_status:
+   type: integer
+   label: 'Enable Basic Cart Order'    
         
     
     

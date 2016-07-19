@@ -77,7 +77,16 @@ class CartForm extends FormBase {
     $form['buttons']['update'] = array(
       '#type' => 'submit',
       '#value' =>  t($config->get('cart_update_button')),
+      '#name' => "update",
     );
+  
+    if($config->get('order_status')) {
+       $form['buttons']['checkout'] = array(
+          '#type' => 'submit',
+          '#value' =>  t('Checkout'),
+          '#name' => "checkout",
+       );
+    }
 
     return $form;
 
@@ -116,14 +125,11 @@ class CartForm extends FormBase {
       }
       $Utility::cart_updated_message();
     }
-
-    // TO DO
-    /*if (module_exists('basic_cart_order') && $form_state['values']['op'] == t('Checkout')) {
-      drupal_goto('checkout');
+    $config = Utility::cart_settings();
+    if($config->get('order_status') && $form_state->getValue('checkout')) {
+      $url = new Url('basiccart.checkout');    
+      $form_state->setRedirectUrl($url);
     }
-    else { 
-      
-    //}*/
   }
 
 
@@ -175,6 +181,5 @@ class CartForm extends FormBase {
     }
     return $prefix;
   }
-
 }
 

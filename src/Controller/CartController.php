@@ -57,18 +57,40 @@ class CartController extends ControllerBase
   }
 
     public function checkout() {
-      $type = node_type_load("basiccart_order"); 
-        $node = $this->entityManager()->getStorage('node')->create(array(
+      $utility = new Utility();
+      $cart = $utility::get_cart();
+      //print_r($cart); die;
+       if(isset($cart['cart']) && !empty($cart['cart'])) {
+          $type = node_type_load("basiccart_order"); 
+          $node = $this->entityManager()->getStorage('node')->create(array(
           'type' => $type->id(),
+          ));
+
+          $node_create_form = $this->entityFormBuilder()->getForm($node);  
+
+          return array(
+          '#type' => 'markup',
+          '#markup' => render($node_create_form),
+          );
+       }else{
+ 
+         $url = new Url('basiccart.cart');    
+         return new RedirectResponse($url->toString()); 
+       } 
+   }    
+      public function order_create() {
+        $type = node_type_load("basiccart_order"); 
+        $node = $this->entityManager()->getStorage('node')->create(array(
+        'type' => $type->id(),
         ));
 
         $node_create_form = $this->entityFormBuilder()->getForm($node);  
- 
+
         return array(
-            '#type' => 'markup',
-            '#markup' => render($node_create_form),
+        '#type' => 'markup',
+        '#markup' => render($node_create_form),
         );
-   }    
-  
+     } 
+
 }
   

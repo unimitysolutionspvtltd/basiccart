@@ -12,6 +12,7 @@ class Utility {
 
   const FIELD_ADDTOCART    = 'addtocart';
   const FIELD_ORDERCONNECT = 'orderconnect';
+  const BASICCART_ORDER    = 'basiccart_order';
 
 
 /**
@@ -361,6 +362,13 @@ public static function price_format($price) {
 
   public static function order_connect_fields() {
     self::create_fields(self::FIELD_ORDERCONNECT);
+  }
+
+  public static function is_basiccart_order($bundle) {
+    if($bundle == self::BASICCART_ORDER) {
+      return TRUE;
+    }
+    return FALSE;
   }
 }
 
