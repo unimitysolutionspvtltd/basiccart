@@ -6,7 +6,8 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
 use Drupal\basiccart\OrderConnectStorage;
 use Drupal\basiccart\Utility;
-
+use Drupal\Component\Utility\SafeMarkup;
+use Drupal\Component\Utility\Xss;
 
 function basiccart_theme($existing, $type, $theme, $path) {
   return array(
@@ -24,10 +25,17 @@ function basiccart_node_view(array &$build, EntityInterface $node, EntityViewDis
   global $base_url;
 }
 
+/**
+* Implements hook_page_attachments().
+*/
 
 function basiccart_page_attachments(array &$page) {
   $page['#attached']['library'][] = 'basiccart/basiccart';
 }
+
+/**
+* Implements hook_entity_insert().
+*/
 
 function basiccart_entity_insert(EntityInterface $node) {
    $utility = new Utility();
@@ -47,6 +55,9 @@ function basiccart_entity_insert(EntityInterface $node) {
   } 
 }
 
+/**
+* Implements hook_form_alter().
+*/
 
 function basiccart_form_alter(&$form,FormStateInterface $form_state, $form_id) {
    $form_ids = array('node_basiccart_order_edit_form', 'node_basiccart_order_form' );
@@ -59,6 +70,10 @@ function basiccart_form_alter(&$form,FormStateInterface $form_state, $form_id) {
    }
 }
 
+/**
+* Implements hook_entity_presave().
+*/
+
 function basiccart_entity_presave(EntityInterface $node) {
    $utility = new Utility();
   if($utility::is_basiccart_order($node->bundle())) {
@@ -70,6 +85,10 @@ function basiccart_entity_presave(EntityInterface $node) {
     }
   }  
 }
+
+/**
+* Implements hook_entity_delete().
+*/
 
 function basiccart_entity_delete(EntityInterface $node) {
    $utility = new Utility();
@@ -86,3 +105,121 @@ function basiccart_entity_delete(EntityInterface $node) {
   } 
 }
 
+
+/**
+* Implements hook_mail().
+*/
+
+function basiccart_mail($key, &$message, $params) {
+  $utility = new Utility();
+  $config = $utility->checkout_settings();
+   $options = array(
+     'langcode' => $message['langcode'],
+   );
+  $message['from'] = \Drupal::config('system.site')->get('mail');
+ switch ($key) {
+    case 'admin_mail':
+      $message['subject'] = t(SafeMarkup::checkPlain($config->admin['subject']));
+      $message['body'][] = Xss::filter($config->admin['body']);
+      break;
+
+    case 'user_mail':
+      $message['subject'] = t(SafeMarkup::checkPlain($config->user['subject']));
+      $message['body'][] = Xss::filter($config->user['body']);
+      break;
+ }
+
+
+
+/**
+ * Sending emails.
+ */
+function basiccart_order_send_notifications($order) {
+  // Admin message.
+  $utility = new Utility();
+  $config = $utility->checkout_settings();
+  $message_html = t(variable_get('basic_cart_admin_message'));
+  
+  // Token data.
+  $data = array('node' => $order);
+  $message_html = token_replace($message_html, $data, array('callback' => 'basic_cart_order_tokens_format'));
+  
+  // Admin mail.
+  $params['admin_message'] = $message_html;
+  $site_mail = variable_get('site_mail');
+  
+  $admin_emails = variable_get('basic_cart_admin_emails');
+  if (empty ($admin_emails)) {
+    // Sending mail to admin.
+    $message = drupal_mail('basic_cart_order', 'admin_mail', $site_mail, language_default(), $params);
+
+    $mails_sent = 0;
+    if ($message['result']) {
+      $mails_sent++;
+    }
+  }
+  else {
+    $admin_emails = explode("\n", $admin_emails);
+    if (is_array($admin_emails) && !empty($admin_emails)) {
+      $ok = FALSE;
+      foreach ($admin_emails as $admin_email) {
+        // Sending mail to each admin.
+        $message = drupal_mail('basic_cart_order', 'admin_mail', $admin_email, language_default(), $params);
+        
+        // Verifing that the mail was sent for at least one email address.
+        if ($message['result']) {
+          $ok = TRUE;
+        }
+      }
+      
+      $mails_sent = 0;
+      if ($ok) {
+        $mails_sent++;
+      }
+    }
+  }
+  
+  // User email.
+  $send_user_mail = variable_get('basic_cart_send_user_message');
+  if ($send_user_mail) {
+    $message_html = t(variable_get('basic_cart_user_message'));
+    
+    // Token data.
+    $data = array('node' => $order);
+    $message_html = token_replace($message_html, $data, array('callback' => 'basic_cart_order_tokens_format'));
+    $params['user_message'] = $message_html;
+    
+    // Sending mail.
+    $email = field_get_items('node', $order, 'field_email');
+    $email = $email[0]['value'];
+    $message = drupal_mail('basic_cart_order', 'user_mail', $email, language_default(), $params);
+
+    if ($message['result']) {
+      $mails_sent++;
+    }
+  }
+  
+  return $mails_sent;
+}
+
+
+/*
+
+ $mailManager = \Drupal::service('plugin.manager.mail');
+ $module = ‘<module_name>’;
+ $key = 'create_article';
+ $to = \Drupal::currentUser()->getEmail();
+ $params['message'] = $entity->get('body')->value;
+ $params['node_title'] = $entity->label();
+ $langcode = \Drupal::currentUser()->getPreferredLangcode();
+ $send = true;
+ $result = $mailManager->mail($module, $key, $to, $langcode, $params, NULL, $send);
+ if ($result['result'] !== true) {
+   drupal_set_message(t('There was a problem sending your message and it was not sent.'), 'error');
+ }
+ else {
+   drupal_set_message(t('Your message has been sent.'));
+ }
+}
+
+ */

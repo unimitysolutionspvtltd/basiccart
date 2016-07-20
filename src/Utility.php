@@ -370,6 +370,11 @@ public static function price_format($price) {
     }
     return FALSE;
   }
+
+  public static function  checkout_settings() {
+    $return = \Drupal::config('checkout.settings');
+    return $return;
+  }
 }
 
  
