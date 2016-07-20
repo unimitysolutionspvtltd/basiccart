@@ -67,7 +67,10 @@ basiccart.settings:
     label: 'Content type'
   order_status:
    type: integer
-   label: 'Enable Basic Cart Order'    
+   label: 'Enable Basic Cart Order'
+  langcode:
+   type: string
+   label: 'Language'       
         
     
     

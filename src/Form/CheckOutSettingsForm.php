@@ -25,7 +25,7 @@ class CheckOutSettingsForm extends ConfigFormBase {
    */
   protected function getEditableConfigNames() {
     return [
-      'basiccart.settings',
+      'basiccart.checkout',
     ];
   }
 
@@ -33,8 +33,7 @@ class CheckOutSettingsForm extends ConfigFormBase {
    * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
-    $config = $this->config('basiccart.settings');
-
+    $config = $this->config('basiccart.checkout');
     $form['email_messages'] = array(
     '#title' => t('Email messages'),
     '#type' => 'fieldset',
@@ -45,7 +44,7 @@ class CheckOutSettingsForm extends ConfigFormBase {
     '#title' => t('Administrator emails'),
     '#type' => 'textarea',
     '#description' => t('After each placed order, an email with the order details will be sent to all the addresses from the list above. Please add one email address per line.'),
-    //'#default_value' => $config->get('content_type'),
+    '#default_value' => $config->get('admin_emails') ? $config->get('admin_emails') :\Drupal::config('system.site')->get('mail'),
     );
 
 
@@ -53,20 +52,20 @@ class CheckOutSettingsForm extends ConfigFormBase {
     '#title' => t('Subject'),
     '#type' => 'textfield',
     '#description' => t("Subject field for the administrator's email."),
-   // '#default_value' => $config->get('currency'),
+    '#default_value' => $config->get('admin')['subject'],
     );
 
     $form['email_messages']['basiccart_administer_message'] = array(
     '#title' => t('Admin email'),
     '#type' => 'textarea',
     '#description' => t('This email will be sent to the site administrator just after an order is placed. Please see all available tokens below. For listing the products, please use: [basiccart_order:products]'),
-    //'#default_value' => $config->get('content_type'),
+    '#default_value' => $config->get('admin')['body'],
     );
     
-    $form['email_messages']['basiccart_sendemailto_user'] = array(
+    $form['email_messages']['basiccart_send_emailto_user'] = array(
     '#type' => 'checkbox',
     '#title' => $this->t('Send an email to the customer after an order is placed'),
-    //'#default_value' => $config->get('price_status'),
+    '#default_value' => $config->get('send_emailto_user'),
     //'#description' => t('Send an email to the customer after an order is placed'),      
     );
 
@@ -74,14 +73,14 @@ class CheckOutSettingsForm extends ConfigFormBase {
     '#title' => t('Subject'),
     '#type' => 'textfield',
     '#description' => t("Subject field for the user's email."),
-   // '#default_value' => $config->get('currency'),
+    '#default_value' => $config->get('user')['subject'],
     );
 
     $form['email_messages']['basiccart_user_message'] = array(
     '#title' => t('User email'),
     '#type' => 'textarea',
     '#description' => t('This email will be sent to the user just after an order is placed. Please see all available tokens below. For listing the products, please use: [basic_cart_order:products]'),
-    //'#default_value' => $config->get('content_type'),
+    '#default_value' => $config->get('user')['body'],
     );
 
      $form['thankyou'] = array(
@@ -95,14 +94,14 @@ class CheckOutSettingsForm extends ConfigFormBase {
     '#title' => t('Title'),
     '#type' => 'textfield',
     '#description' => t("Thank you page title."),
-   // '#default_value' => $config->get('currency'),
+    '#default_value' => $config->get('thankyou')['title'],
     );
 
     $form['thankyou']['basiccart_thankyou_page_text'] = array(
     '#title' => t('Text'),
     '#type' => 'textarea',
     '#description' => t('Thank you page text.'),
-    //'#default_value' => $config->get('content_type'),
+    '#default_value' => $config->get('thankyou')['text'],
     );
 
     return parent::buildForm($form, $form_state);
@@ -112,37 +111,16 @@ class CheckOutSettingsForm extends ConfigFormBase {
    * {@inheritdoc}
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
-    /*$content_types = $this->config('basiccart.settings')->get('content_type');
-    $this->config('basiccart.settings')
-      ->set('cart_page_title', $form_state->getValue('basiccart_cart_page_title'))
-      ->set('empty_cart',$form_state->getValue('basiccart_empty_cart'))
-      ->set('cart_block_title',$form_state->getValue('basiccart_cart_block_title'))
-      ->set('view_cart_button',$form_state->getValue('basiccart_view_cart_button'))
-      ->set('cart_update_button',$form_state->getValue('basiccart_cart_update_button'))
-      ->set('cart_updated_message',$form_state->getValue('basiccart_cart_updated_message'))
-      ->set('quantity_status',$form_state->getValue('basiccart_quantity_status'))
-      ->set('quantity_label',$form_state->getValue('basiccart_quantity_label'))
-      ->set('price_status',$form_state->getValue('basiccart_price_status'))
-      ->set('price_label',$form_state->getValue('basiccart_price_label'))
-      ->set('price_format',$form_state->getValue('basiccart_price_format'))      
-      ->set('total_price_status',$form_state->getValue('basiccart_total_price_status'))
-      ->set('total_price_label',$form_state->getValue('basiccart_total_price_label'))
-      ->set('currency_status',$form_state->getValue('basiccart_currency_status'))
-      ->set('currency',$form_state->getValue('basiccart_currency'))
-      ->set('vat_state',$form_state->getValue('basiccart_vat_state'))
-      ->set('vat_value',$form_state->getValue('basiccart_vat_value'))
-      ->set('add_to_cart_button',$form_state->getValue('basiccart_add_to_cart_button'))
-      ->set('add_to_cart_redirect',$form_state->getValue('basiccart_add_to_cart_redirect'))            
-      ->set('content_type',$form_state->getValue('basiccart_content_types'))
-      ->set('order_status',$form_state->getValue('basiccart_order_status'))
-      ->save();
-    Utility::create_fields();
-    //Utility::order_connect_fields();
-    // To save enabled content types not from settings 
-    foreach($form_state->getValue('basiccart_content_types') as $key => $value){
-     $content_types[$key] = $value ? $value : $content_types[$key];
-    }
-    $this->config('basiccart.settings')->set('content_type',$content_types)->save(); */   
+    $admin = array("subject" => $form_state->getValue('basiccart_subject_admin'),"body" => $form_state->getValue('basiccart_administer_message'));
+    $user = array("subject" => $form_state->getValue('basiccart_subject_user'),"body" => $form_state->getValue('basiccart_user_message'));
+    $thankyou = array("title" => $form_state->getValue('basiccart_thankyou_page_title'),"text" => $form_state->getValue('basiccart_thankyou_page_text'));
+    $this->config('basiccart.checkout')
+      ->set('admin_emails', $form_state->getValue('basiccart_administrator_emails'))
+      ->set('admin',$admin)
+      ->set('user',$user)
+      ->set('send_emailto_user',$form_state->getValue('basiccart_send_emailto_user'))
+      ->set('thankyou',$thankyou)
+      ->save();  
     parent::submitForm($form, $form_state);
   }
 }
