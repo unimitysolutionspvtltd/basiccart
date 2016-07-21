@@ -269,13 +269,13 @@ class CartSettingsForm extends ConfigFormBase {
       ->set('content_type',$form_state->getValue('basiccart_content_types'))
       ->set('order_status',$form_state->getValue('basiccart_order_status'))
       ->save();
-    Utility::create_fields();
+     Utility::create_fields();
     //Utility::order_connect_fields();
     // To save enabled content types not from settings 
     foreach($form_state->getValue('basiccart_content_types') as $key => $value){
      $content_types[$key] = $value ? $value : $content_types[$key];
     }
-    $this->config('basiccart.settings')->set('content_type',$content_types)->save();   
+    $this->config('basiccart.settings')->set('content_type',$content_types)->save();
     parent::submitForm($form, $form_state);
   }
 }

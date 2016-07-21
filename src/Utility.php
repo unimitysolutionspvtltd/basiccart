@@ -56,7 +56,7 @@ public static function get_cart($nid = NULL) {
     return array("cart" => $_SESSION['basiccart']['cart'], "cart_quantity" => $_SESSION['basiccart']['cart_quantity']);
   }
   // Empty cart.
-  return array();
+  return array("cart" => array(),"cart_quantity" => array());
 }
 
 /**
@@ -372,7 +372,7 @@ public static function price_format($price) {
   }
 
   public static function  checkout_settings() {
-    $return = \Drupal::config('checkout.settings');
+    $return = \Drupal::config('basiccart.checkout');
     return $return;
   }
 }

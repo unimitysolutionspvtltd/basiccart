@@ -8,6 +8,9 @@ use Drupal\basiccart\OrderConnectStorage;
 use Drupal\basiccart\Utility;
 use Drupal\Component\Utility\SafeMarkup;
 use Drupal\Component\Utility\Xss;
+use Drupal\Core\Render\BubbleableMetadata;
+
+
 
 function basiccart_theme($existing, $type, $theme, $path) {
   return array(
@@ -43,6 +46,7 @@ function basiccart_entity_insert(EntityInterface $node) {
     $get_cart = $utility::get_cart();
     $cart     = $get_cart['cart'];
     $nid   = $node->id();
+    basiccart_order_send_notifications($node);
     $order = new OrderConnectStorage();
     foreach ($cart  as $key => $value) {
       $params['oid'] = $nid;
@@ -119,39 +123,44 @@ function basiccart_mail($key, &$message, $params) {
   $message['from'] = \Drupal::config('system.site')->get('mail');
  switch ($key) {
     case 'admin_mail':
-      $message['subject'] = t(SafeMarkup::checkPlain($config->admin['subject']));
-      $message['body'][] = Xss::filter($config->admin['body']);
+      $message['subject'] = SafeMarkup::checkPlain($config->get('admin')['subject']);
+      $message['body'][] = Xss::filter($config->get('admin')['body']);
       break;
 
     case 'user_mail':
-      $message['subject'] = t(SafeMarkup::checkPlain($config->user['subject']));
-      $message['body'][] = Xss::filter($config->user['body']);
+      $message['subject'] = SafeMarkup::checkPlain($config->get('user')['subject']);
+      $message['body'][] = Xss::filter($config->get('user')['body']);
       break;
  }
 
-
+}
 
 /**
  * Sending emails.
  */
 function basiccart_order_send_notifications($order) {
+
+  $mailManager = \Drupal::service('plugin.manager.mail');
   // Admin message.
   $utility = new Utility();
+  $token = \Drupal::token();
+
   $config = $utility->checkout_settings();
-  $message_html = t(variable_get('basic_cart_admin_message'));
-  
+  $message_html = t($config->get('admin')['body']);
+
   // Token data.
   $data = array('node' => $order);
-  $message_html = token_replace($message_html, $data, array('callback' => 'basic_cart_order_tokens_format'));
-  
+  $message_html = $token->replace($message_html, $data, array('callback' => 'basiccart_order_tokens_format'));
+
   // Admin mail.
   $params['admin_message'] = $message_html;
-  $site_mail = variable_get('site_mail');
-  
-  $admin_emails = variable_get('basic_cart_admin_emails');
+  $site_mail = \Drupal::config('system.site')->get('mail');
+  $send = true;
+  $admin_emails = $config->get('admin_emails');
+  $langcode = \Drupal::currentUser()->getPreferredLangcode();
   if (empty ($admin_emails)) {
     // Sending mail to admin.
-    $message = drupal_mail('basic_cart_order', 'admin_mail', $site_mail, language_default(), $params);
+  $message = $mailManager->mail('basiccart','admin_mail', $site_mail, $langcode, $params, NULL, $send);
 
     $mails_sent = 0;
     if ($message['result']) {
@@ -164,8 +173,8 @@ function basiccart_order_send_notifications($order) {
       $ok = FALSE;
       foreach ($admin_emails as $admin_email) {
         // Sending mail to each admin.
-        $message = drupal_mail('basic_cart_order', 'admin_mail', $admin_email, language_default(), $params);
-        
+          $message = $mailManager->mail('basiccart','admin_mail', $admin_email, $langcode, $params, NULL, $send);
+
         // Verifing that the mail was sent for at least one email address.
         if ($message['result']) {
           $ok = TRUE;
@@ -180,20 +189,17 @@ function basiccart_order_send_notifications($order) {
   }
   
   // User email.
-  $send_user_mail = variable_get('basic_cart_send_user_message');
+  $send_user_mail = $config->get('send_emailto_user');
   if ($send_user_mail) {
-    $message_html = t(variable_get('basic_cart_user_message'));
-    
+    $message_html =  t($config->get('user')['body']);
     // Token data.
     $data = array('node' => $order);
-    $message_html = token_replace($message_html, $data, array('callback' => 'basic_cart_order_tokens_format'));
+    $message_html = $token->replace($message_html, $data, array('callback' => 'basiccart_order_tokens_format'));
     $params['user_message'] = $message_html;
-    
     // Sending mail.
-    $email = field_get_items('node', $order, 'field_email');
+    $email = $order->getTranslation($langcode)->get('basiccart_email')->getValue();
     $email = $email[0]['value'];
-    $message = drupal_mail('basic_cart_order', 'user_mail', $email, language_default(), $params);
-
+    $message = $mailManager->mail('basiccart','user_mail', $email, $langcode, $params, NULL, $send);
     if ($message['result']) {
       $mails_sent++;
     }
@@ -203,23 +209,103 @@ function basiccart_order_send_notifications($order) {
 }
 
 
-/*
-
- $mailManager = \Drupal::service('plugin.manager.mail');
- $module = ‘<module_name>’;
- $key = 'create_article';
- $to = \Drupal::currentUser()->getEmail();
- $params['message'] = $entity->get('body')->value;
- $params['node_title'] = $entity->label();
- $langcode = \Drupal::currentUser()->getPreferredLangcode();
- $send = true;
- $result = $mailManager->mail($module, $key, $to, $langcode, $params, NULL, $send);
- if ($result['result'] !== true) {
-   drupal_set_message(t('There was a problem sending your message and it was not sent.'), 'error');
- }
- else {
-   drupal_set_message(t('Your message has been sent.'));
- }
+/**
+ * Callback function for formatting the order tokens.
+ * 
+ * @param array $tokens
+ *   The tockens list.
+ * 
+ * @return array $tokens.
+ *   The formatted list of tokens
+ */
+function basiccart_order_tokens_format(&$tokens) {
+  $utility = new Utility();
+  if (is_array($tokens) && count($tokens) > 0) {
+    foreach ($tokens as $token => $value) {
+      switch ($token) {
+        case '[basiccart_order:basiccart_total_price]':
+          $tokens[$token] = $utility::price_format($value->__toString());
+          break;
+        case '[basiccart_order:basiccart_vat]':
+          $tokens[$token] = $utility::price_format($value->__toString());
+          break;  
+      }
+    }
+  }
+  return $tokens;
 }
 
+/**
+ * Implements hook_tokens().
  */
+function basiccart_tokens($type, $tokens, array $data, array $options, BubbleableMetadata $bubbleable_metadata) {
+  $replacements = array();
+  $utility = new Utility();
+  $order = $data["node"];
+  // The first thing that we're going to check for is the type of token - node,
+  // user etc...
+  if ($type == 'basiccart_order') {
+    // Loop through each of the available tokens.
+    foreach ($tokens as $name => $original) {
+      // Find the desired token by name
+      switch ($name) {
+        case 'products':
+          $new = '';
+          $get_cart = $utility::get_cart();
+          $cart = $get_cart['cart'];
+          // Building the order details.
+          $i = 0;
+          $products = '';
+          foreach ($cart as $nid => $node) {
+            $langcode = $node->language()->getId();
+            $price_value = $node->getTranslation($langcode)->get('add_to_cart_price')->getValue();
+            $title = $node->getTranslation($langcode)->get('title')->getValue();
+            $unit_price = $utility::price_format($price_value[0]['value']);
+            $new .= ++$i . '. ' .  $title[0]['value'] . "\t" .
+                              $get_cart['cart_quantity'][$nid] . ' x ' .$unit_price  . "\n";
+          }
+
+          // Add the new value into the replacements array.
+          $replacements[$original] = $new;
+          break;
+         case 'basiccart_total_price':
+          $total = $utility::get_total_price();
+          $langcode = $order->language()->getId();
+          $title = $order->getTranslation($langcode)->get('title')->getValue();
+          $replacements[$original] = !empty($total) && isset($total->total) ? $total->total : 0;
+         break;
+        case 'basiccart_email':
+          $langcode = $order->language()->getId();
+          $email = $order->getTranslation($langcode)->get('basiccart_email')->getValue();
+          $replacements[$original] = isset($email[0]['value']) ? $email[0]['value'] : "" ;
+         break;
+        case 'basiccart_vat':
+          $order = $data["node"];
+          $total = $utility::get_total_price();
+          $langcode = $order->language()->getId();
+          $vat = $order->getTranslation($langcode)->get('basiccart_vat')->getValue();
+          $replacements[$original] = isset($vat[0]['value']) ? $vat[0]['value'] : 0;
+         break;             
+      }
+    }
+  }
+  // Return the replacements.
+  return $replacements;
+}
+
+
+/**
+ * Implements hook_token_info().
+ */
+function basiccart_token_info() {
+  $info = array();
+
+  // Add any new tokens.
+  $info['tokens']['basiccart_order']['products'] = t('Listing of ordered products.');
+  $info['tokens']['basiccart_order']['basiccart_total_price'] = t('Total Price of the Order');
+  $info['tokens']['basiccart_order']['basiccart_vat'] = t('VAT value of the order.');
+  $info['tokens']['basiccart_order']['basiccart_email'] = t('Email defined with the order.');
+
+  // Return them.
+  return $info;
+}

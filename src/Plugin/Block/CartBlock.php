@@ -39,7 +39,7 @@ class CartBlock extends BlockBase {
     $quantity_enabled = $config->get('quantity_status');
     $total_price = $Utility::get_total_price();
     //print_r($total_price); die;
-    $cart_cart = $cart['cart'];
+    $cart_cart = isset($cart['cart']) ? $cart['cart'] : array();
     $output = '';
  if (empty($cart_cart)){
   $output .= '<div class="basiccart-grid basic-cart-block">'.$this->t($config->get('empty_cart')).'</div>';
@@ -86,6 +86,8 @@ else {
 	}
 	$output .= '</div>';
 }
+
+
   return $output;
 }
 
