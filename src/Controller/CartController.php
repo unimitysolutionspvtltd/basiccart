@@ -12,7 +12,8 @@ use Drupal\basiccart\Utility;
 use Drupal\Core\Url;
 use Drupal\Core\Link;
 use Symfony\Component\HttpFoundation\RedirectResponse;
-
+use Drupal\Core\Ajax\AjaxResponse;
+use Drupal\Core\Ajax\HtmlCommand;
 /**
  * Contains the cart controller.
  */
@@ -53,7 +54,19 @@ class CartController extends ControllerBase
     $param['entitytype'] = $query->get('entitytype') ?  $query->get('entitytype') : "node";
     $param['quantity'] = $query->get('quantity') ? $query->get('quantity') : 1;
     Utility::add_to_cart($nid, $param);
-    return new RedirectResponse(Url::fromUri($_SERVER['HTTP_REFERER'])->toString());  
+    //return new RedirectResponse(Url::fromUri($_SERVER['HTTP_REFERER'])->toString());  
+    drupal_get_messages();
+    $message = t('Added to cart');
+      $content = [
+        '#type' => 'html_tag',
+        '#tag' => 'p',
+        '#value' => $message,
+      ];
+    $response = new AjaxResponse();
+    $response->addCommand(new HtmlCommand('#ajax-addtocart-message-'.$nid, $content));
+     
+     return $response;
+
   }
 
     public function checkout() {
