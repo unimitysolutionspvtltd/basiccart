@@ -11,15 +11,15 @@ use Drupal\Core\Link;
  * Plugin implementation of the 'addtocartsearch' formatter.
  *
  * @FieldFormatter(
- *   id = "addtocartsearch",
+ *   id = "addtocartwithquantitysearch",
  *   module = "basiccart",
- *   label = @Translation("Add to cart Search Result"),
+ *   label = @Translation("Add to cart with quantity Search Result"),
  *   field_types = {
  *     "addtocart"
  *   }
  * )
  */
-class AddtoCartSearchFormatter extends FormatterBase {
+class AddtoCartWithQuantitySearchFormatter extends FormatterBase {
 
   /**
    * {@inheritdoc}
@@ -40,29 +40,6 @@ class AddtoCartSearchFormatter extends FormatterBase {
     ),
   );
   $url->setOptions($link_options);
-
-
-
-// Link::createFromRoute(
-//           $this->t('Modal Example'),
-//           'fapi_example.modal_form',
-//            [],
-//            [
-//              'attributes' => [
-//                'class' => ['use-ajax'],
-//                'data-dialog-type' => 'modal',
-//              ],
-//            ]
-//         )->toString();
-
-// array(
-//         '#type' => 'html_tag',
-//         '#tag' => 'a',
-//         '#value' => t($config->get('add_to_cart_button')),
-//         '#attributes' => array(
-//           'href' => $url->toString()."?entitytype=".$entity->getEntityTypeId(),
-//           'class' => 'button use-ajax',
-//         ),
 
 
 $link = new Link($this->t($config->get('add_to_cart_button')),$url);

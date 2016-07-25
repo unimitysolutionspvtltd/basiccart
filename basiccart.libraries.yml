@@ -3,3 +3,9 @@ basiccart:
  css:
   theme:
    css/basiccart.css: {}
+ js: 
+  js/basiccart.js: {}
+  dependencies:
+    - core/jquery
+    - core/jquery.ui
+    - core/drupalSettings   

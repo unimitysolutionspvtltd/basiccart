@@ -105,5 +105,21 @@ class CartController extends ControllerBase
         );
      } 
 
+    public function render_block_content() {
+      $block = \Drupal\block\Entity\Block::load('basiccartblock');
+
+      $block_content = \Drupal::entityTypeManager()
+      ->getViewBuilder('block')
+      ->view($block);
+
+          return array(
+        '#type' => 'container',
+        '#attributes' => array(
+          'class' => array("basiccart-block-ajax"),
+        ),
+        "element-content" => $block_content,
+        '#weight' => 0,
+      );
+    }
 }
   
