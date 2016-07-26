@@ -14,6 +14,9 @@ use Drupal\Core\Link;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Drupal\Core\Ajax\AjaxResponse;
 use Drupal\Core\Ajax\HtmlCommand;
+use Symfony\Component\HttpFoundation\JsonResponse;
+
+
 /**
  * Contains the cart controller.
  */
@@ -52,20 +55,31 @@ class CartController extends ControllerBase
     \Drupal::service('page_cache_kill_switch')->trigger();
     $query = \Drupal::request()->query;
     $param['entitytype'] = $query->get('entitytype') ?  $query->get('entitytype') : "node";
-    $param['quantity'] = $query->get('quantity') ? $query->get('quantity') : 1;
+    $param['quantity'] = $query->get('quantity') ? (($query->get('quantity') != "undefined") ? $query->get('quantity') : 1) : 1;
     Utility::add_to_cart($nid, $param);
     //return new RedirectResponse(Url::fromUri($_SERVER['HTTP_REFERER'])->toString());  
     drupal_get_messages();
-    $message = t('Added to cart');
+    /*$message = t('Added to cart');
       $content = [
         '#type' => 'html_tag',
         '#tag' => 'p',
         '#value' => $message,
-      ];
-    $response = new AjaxResponse();
+      ]; */
+
+    $response = new \stdClass();
+    $response->status = TRUE;
+    $response->text = '<p class="messages messages--status">'.t('Added to cart').'</p>';
+    $response->id = 'ajax-addtocart-message-'.$nid;
+    $utility = new Utility();
+   // $utility->get_cart_content();
+    $response->block = $utility->get_cart_content();
+    return new JsonResponse($response);
+    
+
+    /*$response = new AjaxResponse();
     $response->addCommand(new HtmlCommand('#ajax-addtocart-message-'.$nid, $content));
      
-     return $response;
+     return $response; */
 
   }
 
@@ -107,17 +121,16 @@ class CartController extends ControllerBase
 
     public function render_block_content() {
       $block = \Drupal\block\Entity\Block::load('basiccartblock');
-
       $block_content = \Drupal::entityTypeManager()
       ->getViewBuilder('block')
       ->view($block);
 
           return array(
-        '#type' => 'container',
+        '#type' => 'markup',
         '#attributes' => array(
           'class' => array("basiccart-block-ajax"),
         ),
-        "element-content" => $block_content,
+        "#markup" => drupal_render($block_content),
         '#weight' => 0,
       );
     }
