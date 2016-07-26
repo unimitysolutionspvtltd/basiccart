@@ -2,10 +2,17 @@
  * @file
  * Contains js for the accordion example.
  */
-(function ($, Drupal, drupalSettings) {
+/*(function ($, Drupal, drupalSettings) {
   Drupal.behaviors.basiccart = {
     attach: function (context, settings) {
-          $(".addtocart-quantity-wrapper-container").each(function(){
+
+    }
+  };
+})(jQuery, Drupal, drupalSettings); */
+
+(function ($) {
+  $(function () {
+  $(".addtocart-quantity-wrapper-container").each(function(){
                 var this_id = $(this).attr('id');
                 id_split = this_id.split("_");
                 var dynamic_id = "quantitydynamictext_"+id_split[1];
@@ -29,8 +36,7 @@
 
           }});
       });
-
-    }
-  };
-})(jQuery, Drupal, drupalSettings);
+  })
+})(jQuery);
+          
 
