@@ -310,7 +310,7 @@ function basiccart_token_info() {
   // Return them.
   return $info;
 }
-
+/*
 function basiccart_views_pre_render(ViewExecutable $view) {
   // Scramble the order of the rows shown on this result page.
   // Note that this could be done earlier, but not later in the view execution
@@ -324,3 +324,4 @@ function basiccart_views_pre_render(ViewExecutable $view) {
   //print_r($view->result); die;
   shuffle($view->result);
 }
+ */
