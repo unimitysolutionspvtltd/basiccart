@@ -55,7 +55,7 @@ class CartController extends ControllerBase
     \Drupal::service('page_cache_kill_switch')->trigger();
     $query = \Drupal::request()->query;
     $param['entitytype'] = $query->get('entitytype') ?  $query->get('entitytype') : "node";
-    $param['quantity'] = $query->get('quantity') ? (($query->get('quantity') != "undefined") ? $query->get('quantity') : 1) : 1;
+    $param['quantity'] = $query->get('quantity') ? (is_numeric($query->get('quantity')) ? (int) $query->get('quantity') : 1) : 1;
     Utility::add_to_cart($nid, $param);
     //return new RedirectResponse(Url::fromUri($_SERVER['HTTP_REFERER'])->toString());  
     drupal_get_messages();

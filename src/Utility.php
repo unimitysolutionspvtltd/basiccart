@@ -286,11 +286,11 @@ public static function price_format($price) {
                               ), 'search_result' =>  array(
                                 'label' => 'hidden',
                                 'weight' => 11,
-                                'type' => 'addtocartsearch',
+                                'type' => 'addtocart',
                               ), 'teaser' => array(
                                 'label' => 'hidden',
                                 'weight' => 11,
-                                'type' => 'addtocartsearch',
+                                'type' => 'addtocart',
                               ),) 
 
                       ), 
