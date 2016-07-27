@@ -9,6 +9,7 @@ use Drupal\basiccart\Utility;
 use Drupal\Component\Utility\SafeMarkup;
 use Drupal\Component\Utility\Xss;
 use Drupal\Core\Render\BubbleableMetadata;
+use Drupal\views\ViewExecutable;
 
 
 
@@ -308,4 +309,18 @@ function basiccart_token_info() {
 
   // Return them.
   return $info;
+}
+
+function basiccart_views_pre_render(ViewExecutable $view) {
+  // Scramble the order of the rows shown on this result page.
+  // Note that this could be done earlier, but not later in the view execution
+  // process.
+  print_r($view->field['add_to_cart']); die;
+  foreach ($view->result as $value) {
+    # code...
+    print_r($value);
+  }
+  die;
+  //print_r($view->result); die;
+  shuffle($view->result);
 }

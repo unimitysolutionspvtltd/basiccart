@@ -341,13 +341,14 @@ public static function price_format($price) {
            if($config['widget']) {
               entity_get_form_display($config['entity_type'], $bundle, 'default')
               ->setComponent($field_name, $config['widget'])
-              ->save();
+              ->save(); 
            }
-           if($config['formatter']) {  
+           if($config['formatter']) { 
              foreach ($config['formatter'] as $view => $formatter) {
                 if (isset($view_modes[$view]) || $view == "default") { 
+                  $formatter['type'] = ($formatter['type'] == "addcartsearch") ? "addtocart"  : $formatter['type'];
                    entity_get_display($config['entity_type'], $bundle, $view)
-                  ->setComponent($field_name, !is_array($formatter) ? $config['formatter']['default'] : $formatter)
+                  ->setComponent($field_name, !is_array($formatter) ? $config['formatter']['default'] : $config['formatter']['default'])
                   ->save();
                 }  
              } 
