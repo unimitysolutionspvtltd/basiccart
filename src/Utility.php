@@ -50,7 +50,7 @@ public static function _price_format() {
  *   An empty array if there is nothing in the cart
  */
 public static function get_cart($nid = NULL) {
-
+//print_r($nid); die;
   if (isset($nid)) {
     return array("cart" => $_SESSION['basiccart']['cart'][$nid], "cart_quantity" => $_SESSION['basiccart']['cart_quantity'][$nid]);
   }
@@ -385,11 +385,10 @@ public static function price_format($price) {
     $cart = $Utility->get_cart();
     $quantity_enabled = $config->get('quantity_status');
     $total_price = $Utility->get_total_price();
-    //print_r($total_price); die;
     $cart_cart = isset($cart['cart']) ? $cart['cart'] : array();
     $output = '';
  if (empty($cart_cart)){
-  $output .= '<div class="basiccart-grid basic-cart-block">'.$this->t($config->get('empty_cart')).'</div>';
+  $output .= '<div class="basiccart-grid basic-cart-block">'.t($config->get('empty_cart')).'</div>';
   } 
 else {
 
