@@ -240,7 +240,7 @@ class CartSettingsForm extends ConfigFormBase {
 
     $form['configure']['basiccart_added_to_cart_message'] = array(
     '#type' => 'textfield',
-    '#title' => $this->t('Add to Cart'),
+    '#title' => $this->t('Added to Cart'),
     '#default_value' => $config->get('added_to_cart_message'),
     '#description' => t('Please configure your text on to appear after the entity is added to cart '),
     );
@@ -281,7 +281,7 @@ class CartSettingsForm extends ConfigFormBase {
     foreach($form_state->getValue('basiccart_content_types') as $key => $value){
      $content_types[$key] = $value ? $value : $content_types[$key];
     }
-    
+
     $this->config('basiccart.settings')->set('content_type',$content_types)->save();
     parent::submitForm($form, $form_state);
   }

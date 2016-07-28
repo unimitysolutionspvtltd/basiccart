@@ -269,7 +269,7 @@ public static function price_format($price) {
                                 'label' => 'inline',
                                 'type' => 'number_decimal',
                                 'weight' => 11,
-                              ), /*'search_result' =>  'default',*/ 'teaser' => 'default') 
+                              ), 'search_result' =>  'default', 'teaser' => 'default') 
                       ),
                       'add_to_cart' => array(
                         'type' => 'addtocart',
@@ -346,7 +346,7 @@ public static function price_format($price) {
            if($config['formatter']) { 
              foreach ($config['formatter'] as $view => $formatter) {
                 if (isset($view_modes[$view]) || $view == "default") { 
-                  $formatter['type'] = ($formatter['type'] == "addcartsearch") ? "addtocart"  : $formatter['type'];
+                  //$formatter['type'] = ($formatter['type'] == "addcartsearch") ? "addtocart"  : $formatter['type'];
                    entity_get_display($config['entity_type'], $bundle, $view)
                   ->setComponent($field_name, !is_array($formatter) ? $config['formatter']['default'] : $config['formatter']['default'])
                   ->save();
