@@ -306,10 +306,10 @@ function basiccart_token_info() {
   $info = array();
 
   // Add any new tokens.
-  $info['tokens']['basiccart_order']['products'] = t('Listing of ordered products.');
-  $info['tokens']['basiccart_order']['basiccart_total_price'] = t('Total Price of the Order');
-  $info['tokens']['basiccart_order']['basiccart_vat'] = t('VAT value of the order.');
-  $info['tokens']['basiccart_order']['basiccart_email'] = t('Email defined with the order.');
+  $info['tokens']['basiccart_order']['products'] = 'Listing of ordered products.';
+  $info['tokens']['basiccart_order']['basiccart_total_price'] = 'Total Price of the Order';
+  $info['tokens']['basiccart_order']['basiccart_vat'] = 'VAT value of the order.';
+  $info['tokens']['basiccart_order']['basiccart_email'] = 'Email defined with the order.';
 
   // Return them.
   return $info;
