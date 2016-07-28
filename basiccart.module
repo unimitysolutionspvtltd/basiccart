@@ -154,7 +154,7 @@ function basiccart_order_send_notifications($order) {
   $message_html = $config->get('admin')['body'];
 
   // Token data.
-  $data =  $order;
+  $data = array('node' => $order);
   $message_html = $token->replace($message_html, $data, array('callback' => 'basiccart_order_tokens_format'));
 
   // Admin mail.
@@ -198,6 +198,7 @@ function basiccart_order_send_notifications($order) {
   if ($send_user_mail) {
     $message_html =  $config->get('user')['body'];
     // Token data.
+    $data = array('node' => $order);
     $message_html = $token->replace($message_html, $data, array('callback' => 'basiccart_order_tokens_format'));
     $params['user_message'] = $message_html;
     // Sending mail.
@@ -245,7 +246,7 @@ function basiccart_order_tokens_format(&$tokens) {
 function basiccart_tokens($type, $tokens, array $data, array $options, BubbleableMetadata $bubbleable_metadata) {
   $replacements = array();
   $utility = new Utility();
-  $order = $data;
+  $order = isset($data["node"]) ? $data["node"] : array() ;
   // The first thing that we're going to check for is the type of token - node,
   // user etc...
   if ($type == 'basiccart_order') {
