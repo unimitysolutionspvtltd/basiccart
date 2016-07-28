@@ -129,12 +129,12 @@ function basiccart_mail($key, &$message, $params) {
  switch ($key) {
     case 'admin_mail':
       $message['subject'] = SafeMarkup::checkPlain($config->get('admin')['subject']);
-      $message['body'][] = Xss::filter($config->get('admin')['body']);
+      $message['body'][] = Xss::filter($params['admin_message']);
       break;
 
     case 'user_mail':
       $message['subject'] = SafeMarkup::checkPlain($config->get('user')['subject']);
-      $message['body'][] = Xss::filter($config->get('user')['body']);
+      $message['body'][] = Xss::filter($params['user_message']);
       break;
  }
 
@@ -154,7 +154,7 @@ function basiccart_order_send_notifications($order) {
   $message_html = $config->get('admin')['body'];
 
   // Token data.
-  $data = array('node' => $order);
+  $data =  $order;
   $message_html = $token->replace($message_html, $data, array('callback' => 'basiccart_order_tokens_format'));
 
   // Admin mail.
@@ -198,7 +198,6 @@ function basiccart_order_send_notifications($order) {
   if ($send_user_mail) {
     $message_html =  $config->get('user')['body'];
     // Token data.
-    $data = array('node' => $order);
     $message_html = $token->replace($message_html, $data, array('callback' => 'basiccart_order_tokens_format'));
     $params['user_message'] = $message_html;
     // Sending mail.
@@ -246,7 +245,7 @@ function basiccart_order_tokens_format(&$tokens) {
 function basiccart_tokens($type, $tokens, array $data, array $options, BubbleableMetadata $bubbleable_metadata) {
   $replacements = array();
   $utility = new Utility();
-  $order = $data["node"];
+  $order = $data;
   // The first thing that we're going to check for is the type of token - node,
   // user etc...
   if ($type == 'basiccart_order') {
