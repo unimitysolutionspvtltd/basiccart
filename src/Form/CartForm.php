@@ -67,13 +67,6 @@ class CartForm extends FormBase {
       '#suffix' => '</div></div>',
     );
 
-    // Update button.
-    /* Custom requirement code  to be removed */
-    /*$form['buttons']['update'] = array(
-      '#type' => 'submit',
-      '#value' => t('Apply'),
-    );*/
-
     $form['buttons']['update'] = array(
       '#type' => 'submit',
       '#value' =>  t($config->get('cart_update_button')),
@@ -96,17 +89,6 @@ class CartForm extends FormBase {
    * {@inheritdoc}
    */
  public function submitForm(array &$form, FormStateInterface $form_state) {
-  
-    /* Custom requirement code  to be removed */
-    /*$user = \Drupal::currentUser();
-    if($user ->id()){
-      $url = new Url('entity.profile.type.student_application_.user_profile_form',array("user"=>$user->id(),"profile_type" => "student_application_"));    
-      $form_state->setRedirectUrl($url);
-    }else{
-     $url = URL::fromUserInput('/user/login/?destination=get-profile');
-      $form_state->setRedirectUrl($url);
-    } */
-    
     $Utility = new Utility();
     $config = $Utility::cart_settings();  
 

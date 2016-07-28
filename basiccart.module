@@ -25,8 +25,12 @@ function basiccart_theme($existing, $type, $theme, $path) {
 /**
  * Implements hook_ENTITY_TYPE_view() for node entities.
  */
-function basiccart_node_view(array &$build, EntityInterface $node, EntityViewDisplayInterface $display, $view_mode) {
-  global $base_url;
+
+function basiccart_entity_view_alter(array &$build, EntityInterface $entity, EntityViewDisplayInterface $display) { //die;
+  /*print $entity->hasfield('add_to_cart'); die;
+   if($entity->getEntityTypeId() == "test1") {
+    die;
+   } */
 }
 
 /**
@@ -147,7 +151,7 @@ function basiccart_order_send_notifications($order) {
   $token = \Drupal::token();
 
   $config = $utility->checkout_settings();
-  $message_html = t($config->get('admin')['body']);
+  $message_html = $config->get('admin')['body'];
 
   // Token data.
   $data = array('node' => $order);
@@ -192,7 +196,7 @@ function basiccart_order_send_notifications($order) {
   // User email.
   $send_user_mail = $config->get('send_emailto_user');
   if ($send_user_mail) {
-    $message_html =  t($config->get('user')['body']);
+    $message_html =  $config->get('user')['body'];
     // Token data.
     $data = array('node' => $order);
     $message_html = $token->replace($message_html, $data, array('callback' => 'basiccart_order_tokens_format'));
