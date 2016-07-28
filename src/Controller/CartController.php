@@ -57,36 +57,19 @@ class CartController extends ControllerBase
     $param['entitytype'] = $query->get('entitytype') ?  $query->get('entitytype') : "node";
     $param['quantity'] = $query->get('quantity') ? (is_numeric($query->get('quantity')) ? (int) $query->get('quantity') : 1) : 1;
     Utility::add_to_cart($nid, $param);
-    //return new RedirectResponse(Url::fromUri($_SERVER['HTTP_REFERER'])->toString());  
     drupal_get_messages();
-    /*$message = t('Added to cart');
-      $content = [
-        '#type' => 'html_tag',
-        '#tag' => 'p',
-        '#value' => $message,
-      ]; */
-
     $response = new \stdClass();
     $response->status = TRUE;
     $response->text = '<p class="messages messages--status">'.t('Added to cart').'</p>';
     $response->id = 'ajax-addtocart-message-'.$nid;
     $utility = new Utility();
-   // $utility->get_cart_content();
     $response->block = $utility->get_cart_content();
     return new JsonResponse($response);
-    
-
-    /*$response = new AjaxResponse();
-    $response->addCommand(new HtmlCommand('#ajax-addtocart-message-'.$nid, $content));
-     
-     return $response; */
-
   }
 
     public function checkout() {
       $utility = new Utility();
       $cart = $utility::get_cart();
-      //print_r($cart); die;
        if(isset($cart['cart']) && !empty($cart['cart'])) {
           $type = node_type_load("basiccart_order"); 
           $node = $this->entityManager()->getStorage('node')->create(array(
@@ -117,22 +100,6 @@ class CartController extends ControllerBase
         '#type' => 'markup',
         '#markup' => render($node_create_form),
         );
-     } 
-
-    public function render_block_content() {
-      $block = \Drupal\block\Entity\Block::load('basiccartblock');
-      $block_content = \Drupal::entityTypeManager()
-      ->getViewBuilder('block')
-      ->view($block);
-
-          return array(
-        '#type' => 'markup',
-        '#attributes' => array(
-          'class' => array("basiccart-block-ajax"),
-        ),
-        "#markup" => drupal_render($block_content),
-        '#weight' => 0,
-      );
-    }
+     }
 }
   

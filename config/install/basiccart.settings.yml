@@ -20,5 +20,6 @@ add_to_cart_redirect: home
 content_type: { }
 order_status: 0
 langcode: en
+added_to_cart_message: Added to cart
 
 

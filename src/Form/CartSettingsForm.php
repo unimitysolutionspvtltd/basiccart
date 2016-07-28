@@ -237,7 +237,13 @@ class CartSettingsForm extends ConfigFormBase {
     '#default_value' => $config->get('add_to_cart_button'),
     '#description' => t('Please configure your text on update cart button '),
     );
-    
+
+    $form['configure']['basiccart_added_to_cart_message'] = array(
+    '#type' => 'textfield',
+    '#title' => $this->t('Add to Cart'),
+    '#default_value' => $config->get('added_to_cart_message'),
+    '#description' => t('Please configure your text on to appear after the entity is added to cart '),
+    );
     return parent::buildForm($form, $form_state);
   }
 
@@ -265,16 +271,17 @@ class CartSettingsForm extends ConfigFormBase {
       ->set('vat_state',$form_state->getValue('basiccart_vat_state'))
       ->set('vat_value',$form_state->getValue('basiccart_vat_value'))
       ->set('add_to_cart_button',$form_state->getValue('basiccart_add_to_cart_button'))
+      ->set('added_to_cart_message',$form_state->getValue('basiccart_added_to_cart_message'))
       ->set('add_to_cart_redirect',$form_state->getValue('basiccart_add_to_cart_redirect'))            
       ->set('content_type',$form_state->getValue('basiccart_content_types'))
       ->set('order_status',$form_state->getValue('basiccart_order_status'))
       ->save();
      Utility::create_fields();
-    //Utility::order_connect_fields();
-    // To save enabled content types not from settings 
+
     foreach($form_state->getValue('basiccart_content_types') as $key => $value){
      $content_types[$key] = $value ? $value : $content_types[$key];
     }
+    
     $this->config('basiccart.settings')->set('content_type',$content_types)->save();
     parent::submitForm($form, $form_state);
   }

@@ -70,7 +70,10 @@ basiccart.settings:
    label: 'Enable Basic Cart Order'
   langcode:
    type: string
-   label: 'Language'       
+   label: 'Language'
+  added_to_cart_message:
+   type: string
+   label: 'Added to cart message'          
         
     
     
