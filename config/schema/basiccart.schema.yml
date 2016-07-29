@@ -74,6 +74,9 @@ basiccart.settings:
   added_to_cart_message:
    type: string
    label: 'Added to cart message'          
+  use_cart_table:
+   type: integer
+   label: 'Enable cart in table'
         
     
     

@@ -66,6 +66,20 @@ class CartSettingsForm extends ConfigFormBase {
     '#default_value' => $config->get('content_type'),
     );
 
+
+    $form['table'] = array(
+    '#title' => t('Store cart data in database table'),
+    '#type' => 'fieldset',
+    '#description' => t('Enable cart to store the data in database instead of session.'),
+    );
+
+    $form['table']['basiccart_use_cart_table'] = array(
+    '#title' => t('Persist cart data'),
+    '#type' => 'checkbox',
+    '#description' => t('This option will enable to persist cart data even the user is logged out and logging in again'),
+    '#default_value' => $config->get('use_cart_table'),
+    );
+
     $form['currency'] = array(
     '#title' => t('Currency and price'),
     '#type' => 'fieldset',
@@ -275,6 +289,7 @@ class CartSettingsForm extends ConfigFormBase {
       ->set('add_to_cart_redirect',$form_state->getValue('basiccart_add_to_cart_redirect'))            
       ->set('content_type',$form_state->getValue('basiccart_content_types'))
       ->set('order_status',$form_state->getValue('basiccart_order_status'))
+      ->set('use_cart_table',$form_state->getValue('basiccart_use_cart_table'))
       ->save();
      Utility::create_fields();
 
