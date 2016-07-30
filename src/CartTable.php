@@ -3,6 +3,7 @@
 namespace Drupal\basiccart;
 
 use Drupal\basiccart\CartInterface;
+use Drupal\basiccart\Settings;
 
 /**
  * Class CartTable.
@@ -62,7 +63,7 @@ class CartTable implements CartInterface {
 
 
   public  function add_to_cart($id, $params = array()) {
-    $config = self::cart_settings();
+    $config = Settings::cart_settings();
     if(!empty($params)) {
       $quantity = $params['quantity'];
       $entitytype = $params['entitytype'];
@@ -81,7 +82,7 @@ class CartTable implements CartInterface {
                $_SESSION['basiccart']['cart_quantity'][$id] = $quantity;
             }
       }
-      self::cart_updated_message();
+      Settings::cart_updated_message();
     }  
   }
 
