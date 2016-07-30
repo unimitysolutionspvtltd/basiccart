@@ -25,10 +25,9 @@ class CartForm extends FormBase {
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
       // Getting the shopping cart.
-    $Utility = new Utility();  
+    $Utility = new Utility();
     $cart = $Utility::get_cart();
     $config = $Utility::cart_settings();  
-
     $langcode = \Drupal::languageManager()->getCurrentLanguage()->getId();
     // And now the form.
     $form['cartcontents'] = array(
