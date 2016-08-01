@@ -20,7 +20,9 @@ class Utility extends Settings {
   const BASICCART_ORDER    = 'basiccart_order';
 
   private static function get_storage() {
-     $storage = new CartStorageSelect('E');
+     $user = \Drupal::currentUser();
+     $config = self::cart_settings();
+     $storage = new CartStorageSelect($user, $config->get('use_cart_table'));
      return $storage;
   }
 
@@ -78,7 +80,11 @@ public static function get_cart($nid = NULL) {
   $storage = static::get_storage();
   $storage->add_to_cart($id, $params);  
   }
-  
+   
+  public function loggedinactioncart() {
+	  $storage = static::get_storage();
+    return $storage->loggedinactioncart();   
+  } 
 }
 
  

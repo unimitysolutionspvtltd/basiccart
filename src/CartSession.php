@@ -9,7 +9,13 @@ use Drupal\basiccart\Settings;
  */
 class CartSession implements CartInterface {	
 
+  protected $user;
+  protected $user_id;
 
+	public function __construct($user) {
+		$this->user = $user;
+		$this->user_id = $user->id();
+	}
 
 
 	/**
@@ -85,4 +91,7 @@ class CartSession implements CartInterface {
     }  
   }
 
+  protected function loggedinactioncart() {
+    return TRUE;
+	}
 }	

@@ -198,9 +198,9 @@ public static function _price_format() {
     $fields = ($type == self::FIELD_ORDERCONNECT) ? self::get_fields_config(self::FIELD_ORDERCONNECT) : self::get_fields_config();
     $view_modes = \Drupal::entityManager()->getViewModes('node');
     foreach($fields->fields as $field_name => $config) {
-     $field_storage = FieldStorageConfig::loadByName($config['entity_type'], $field_name);
+     $field_storage = Drupal\field\Entity\FieldStorageConfig::loadByName($config['entity_type'], $field_name);
      if(empty($field_storage)) {
-        FieldStorageConfig::create(array(
+        Drupal\field\Entity\FieldStorageConfig::create(array(
             'field_name' => $field_name,
             'entity_type' => $config['entity_type'],
             'type' => $config['type'],
@@ -221,9 +221,9 @@ public static function _price_format() {
         if(isset($config['settings'])) {
           $config_array['settings'] = $config['settings'];
         }
-        $field = FieldConfig::loadByName($config['entity_type'], $bundle, $field_name);
+        $field = Drupal\field\Entity\FieldConfig::loadByName($config['entity_type'], $bundle, $field_name);
         if(empty($field) && $bundle !== "" && !empty($bundle)) {
-                FieldConfig::create($config_array)->save();
+                Drupal\field\Entity\FieldConfig::create($config_array)->save();
         }
 
         if($bundle !== "" && !empty($bundle)) {
@@ -325,9 +325,10 @@ else {
     $langcode = $node->language()->getId();
       $price_value = $node->getTranslation($langcode)->get('add_to_cart_price')->getValue();
       $title = $node->getTranslation($langcode)->get('title')->getValue();
-      $url = new Url('entity.node.canonical',array("node"=>$nid));
 
-      $link = new Link($title[0]['value'],$url);
+      $url = new Drupal\Core\Url('entity.node.canonical',array("node"=>$nid));
+
+      $link = new Drupal\Core\Link($title[0]['value'],$url);
          $output .= '<div class="basiccart-cart-contents row">
           <div class="basiccart-cart-node-title cell">'.$link->toString().'</div>';
          if($quantity_enabled) {
@@ -351,7 +352,7 @@ else {
           <div class="basiccart-total-vat cell">'.t('Total VAT').': <strong>'.$Utility->price_format($total_price->vat).'</strong></div>
         </div>';
         }
-      $url = new Url('basiccart.cart');
+      $url = new Drupal\Core\Url('basiccart.cart');
       //$link = new Link($this->t($config->get('view_cart_button')),$url);
       $link = "<a href='".$url->toString()."' class='button'>".t($config->get('view_cart_button'))."</a>";
         $output .='<div class="basiccart-cart-checkout-button basiccart-cart-checkout-button-block row">

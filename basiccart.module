@@ -314,6 +314,12 @@ function basiccart_token_info() {
   // Return them.
   return $info;
 }
+
+
+function basiccart_user_login($account) {
+ $utility = new Utility();
+ $utility->loggedinactioncart();
+}
 /*
 function basiccart_views_pre_render(ViewExecutable $view) {
   // Scramble the order of the rows shown on this result page.

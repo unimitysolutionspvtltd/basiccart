@@ -7,19 +7,22 @@ namespace Drupal\basiccart;
 
 use Drupal\basiccart\CartSession;
 use Drupal\basiccart\CartTable;
-
+use Drupal\basiccart\CartStorage;
 
 class CartStorageSelect {
 
     private $cart = NULL; 
+    private $cart_storage;
 
-    public function __construct($strategy_ind_id) {
-        switch ($strategy_ind_id) {
-            case "C": 
-                $this->cart = new CartSession();
+    public function __construct($user, $use_table = NULL) {
+        $enable = $user->id() && $use_table ? $user->id() : 0 ; 
+        switch ($enable) {
+            case 0: 
+                $this->cart = new CartSession($user);
             break;
-            case "E": 
-                $this->cart = new CartTable();
+            default:    
+								$cart_storage = new CartStorage();
+                $this->cart   = new CartTable($cart_storage, $user);
             break;
         }
     }
@@ -36,5 +39,9 @@ class CartStorageSelect {
     }
     public  function add_to_cart($id, $params = array()) {
         return $this->cart->add_to_cart($id, $params);
+    }
+
+    public function loggedinactioncart() {
+     return $this->cart->loggedinactioncart();
     }
 }

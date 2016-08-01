@@ -65,6 +65,7 @@ class CartStorage {
           ->fields($entry)
           ->condition('uid', $entry['uid'])
           ->condition('id', $entry['id'])
+					->condition('entitytype', $entry['entitytype'])
           ->execute();
     }
     catch (\Exception $e) {
@@ -87,10 +88,15 @@ class CartStorage {
    * @see db_delete()
    */
   public static function delete($entry) {
-    db_delete(self::TABLE)
-         ->condition('uid', $entry['uid'])
-         ->condition('id', $entry['id'])
-        ->execute();
+    $delete = db_delete(self::TABLE);
+		if($entry['uid']) {
+			$delete->condition('uid', $entry['uid']);
+		}
+   if($entry['id']){
+		$delete->condition('id', $entry['id']);
+		$delete->condition('entitytype', $entry['entitytype'] ? $entry['entitytype'] : 'node' );  
+		} 
+    $delete->execute();
   }
 
   /**
