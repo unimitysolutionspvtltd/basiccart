@@ -70,7 +70,7 @@ class CartSettingsForm extends ConfigFormBase {
     $form['table'] = array(
     '#title' => t('Store cart data in database table'),
     '#type' => 'fieldset',
-    '#description' => t('Enable cart to store the data in database instead of session.'),
+    '#description' => t('Enable cart to store the data in database instead of session. Data will persist only when user logged in'),
     );
 
     $form['table']['basiccart_use_cart_table'] = array(
