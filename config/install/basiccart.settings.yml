@@ -21,6 +21,6 @@ content_type: { }
 order_status: 0
 langcode: en
 added_to_cart_message: Added to cart
-use_cart_table:0
+use_cart_table: 0
 
 
