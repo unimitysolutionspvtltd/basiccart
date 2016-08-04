@@ -198,9 +198,9 @@ public static function _price_format() {
     $fields = ($type == self::FIELD_ORDERCONNECT) ? self::get_fields_config(self::FIELD_ORDERCONNECT) : self::get_fields_config();
     $view_modes = \Drupal::entityManager()->getViewModes('node');
     foreach($fields->fields as $field_name => $config) {
-     $field_storage = Drupal\field\Entity\FieldStorageConfig::loadByName($config['entity_type'], $field_name);
+     $field_storage = FieldStorageConfig::loadByName($config['entity_type'], $field_name);
      if(empty($field_storage)) {
-        Drupal\field\Entity\FieldStorageConfig::create(array(
+        FieldStorageConfig::create(array(
             'field_name' => $field_name,
             'entity_type' => $config['entity_type'],
             'type' => $config['type'],
@@ -221,9 +221,9 @@ public static function _price_format() {
         if(isset($config['settings'])) {
           $config_array['settings'] = $config['settings'];
         }
-        $field = Drupal\field\Entity\FieldConfig::loadByName($config['entity_type'], $bundle, $field_name);
+        $field = FieldConfig::loadByName($config['entity_type'], $bundle, $field_name);
         if(empty($field) && $bundle !== "" && !empty($bundle)) {
-                Drupal\field\Entity\FieldConfig::create($config_array)->save();
+                DFieldConfig::create($config_array)->save();
         }
 
         if($bundle !== "" && !empty($bundle)) {
