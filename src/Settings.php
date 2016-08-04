@@ -326,9 +326,9 @@ else {
       $price_value = $node->getTranslation($langcode)->get('add_to_cart_price')->getValue();
       $title = $node->getTranslation($langcode)->get('title')->getValue();
 
-      $url = new Drupal\Core\Url('entity.node.canonical',array("node"=>$nid));
+      $url = new Url('entity.node.canonical',array("node"=>$nid));
 
-      $link = new Drupal\Core\Link($title[0]['value'],$url);
+      $link = new Link($title[0]['value'],$url);
          $output .= '<div class="basiccart-cart-contents row">
           <div class="basiccart-cart-node-title cell">'.$link->toString().'</div>';
          if($quantity_enabled) {
@@ -352,7 +352,7 @@ else {
           <div class="basiccart-total-vat cell">'.t('Total VAT').': <strong>'.$Utility->price_format($total_price->vat).'</strong></div>
         </div>';
         }
-      $url = new Drupal\Core\Url('basiccart.cart');
+      $url = new Url('basiccart.cart');
       //$link = new Link($this->t($config->get('view_cart_button')),$url);
       $link = "<a href='".$url->toString()."' class='button'>".t($config->get('view_cart_button'))."</a>";
         $output .='<div class="basiccart-cart-checkout-button basiccart-cart-checkout-button-block row">
