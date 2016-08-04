@@ -91,7 +91,7 @@ class CartSession implements CartInterface {
     }  
   }
 
-  protected function loggedinactioncart() {
+  public function loggedinactioncart() {
     return TRUE;
 	}
 }	
