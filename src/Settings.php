@@ -223,7 +223,7 @@ public static function _price_format() {
         }
         $field = FieldConfig::loadByName($config['entity_type'], $bundle, $field_name);
         if(empty($field) && $bundle !== "" && !empty($bundle)) {
-                DFieldConfig::create($config_array)->save();
+                FieldConfig::create($config_array)->save();
         }
 
         if($bundle !== "" && !empty($bundle)) {
