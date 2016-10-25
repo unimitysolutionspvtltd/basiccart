@@ -58,6 +58,9 @@ class CartController extends ControllerBase
     $param['entitytype'] = $query->get('entitytype') ?  $query->get('entitytype') : "node";
     $param['quantity'] = $query->get('quantity') ? (is_numeric($query->get('quantity')) ? (int) $query->get('quantity') : 1) : 1;
     Utility::add_to_cart($nid, $param);
+    if ($config->get('add_to_cart_redirect') != "<none>") {
+
+    } else {
     drupal_get_messages();
     $response = new \stdClass();
     $response->status = TRUE;
@@ -65,6 +68,8 @@ class CartController extends ControllerBase
     $response->id = 'ajax-addtocart-message-'.$nid;
     $response->block = Utility::get_cart_content();
     return new JsonResponse($response);
+    }
+
   }
 
     public function checkout() {
@@ -101,5 +106,16 @@ class CartController extends ControllerBase
         '#markup' => render($node_create_form),
         );
      }
+
+     public function addToCartNoRedirect($nid) {
+      \Drupal::service('page_cache_kill_switch')->trigger();
+      $query = \Drupal::request()->query;
+      $config = Utility::cart_settings();
+      $param['entitytype'] = $query->get('entitytype') ?  $query->get('entitytype') : "node";
+      $param['quantity'] = $query->get('quantity') ? (is_numeric($query->get('quantity')) ? (int) $query->get('quantity') : 1) : 1;
+      Utility::add_to_cart($nid, $param);
+      return new RedirectResponse(Url::fromUserInput("/".trim($config->get('add_to_cart_redirect'),'/'))->toString());  
+
+     }
 }
-  
+ 

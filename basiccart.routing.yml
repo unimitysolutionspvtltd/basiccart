@@ -61,5 +61,15 @@ basiccart.checkout_settings:
   _form: '\Drupal\basiccart\Form\CheckOutSettingsForm'
   _title: 'Basic Cart Settings'
  requirements:
-  _permission: 'basiccart admin_cart'       
-
+  _permission: 'basiccart admin_cart'
+basiccart.cartadddirect:
+ path: '/cart/add/direct/{nid}'
+ defaults:
+  _controller: '\Drupal\basiccart\Controller\CartController::addToCartNoRedirect'
+  _title_callback: '\Drupal\basiccart\Controller\CartController::getCartPageTitle'
+ requirements:
+  _permission: 'basiccart use_cart'
+ options:
+  parameters:
+   nid:
+    with_config_overrides: TRUE

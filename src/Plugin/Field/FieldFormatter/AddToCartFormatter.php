@@ -27,14 +27,17 @@ class AddtoCartFormatter extends FormatterBase {
   $entity = $items->getEntity();
       $config = \Drupal::config('basiccart.settings');
       $elements = array();
-
        $option = [
       'query' => ['entitytype' => $entity->getEntityTypeId(),'quantity' => ''],
       'absolute' => TRUE
       ];
-      $url = Url::fromRoute('basiccart.cartadd',["nid"=>$entity->id()],$option);
-     // print_r($url->toString()); die;
-      $link = '<a id="forquantitydynamictext_'.$entity->id().'" class="basiccart-get-quantity button use-basiccart-ajax" href="'.$url->toString().'">'.$this->t($config->get('add_to_cart_button')).'</a>';
+      if(trim($config->get('add_to_cart_redirect')) != "<none>" && trim($config->get('add_to_cart_redirect')) != "") { 
+        $url = Url::fromRoute('basiccart.cartadddirect',["nid"=>$entity->id()],$option);
+        $link = '<a id="forquantitydynamictext_'.$entity->id().'" class="basiccart-get-quantity button" href="'.$url->toString().'">'.$this->t($config->get('add_to_cart_button')).'</a>';
+      }else { 
+        $url = Url::fromRoute('basiccart.cartadd',["nid"=>$entity->id()],$option);
+        $link = '<a id="forquantitydynamictext_'.$entity->id().'" class="basiccart-get-quantity button use-basiccart-ajax" href="'.$url->toString().'">'.$this->t($config->get('add_to_cart_button')).'</a>';
+      }
     $link_options = [
       'attributes' => [
         'class' => [
