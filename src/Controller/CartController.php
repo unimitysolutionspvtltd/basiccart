@@ -54,17 +54,16 @@ class CartController extends ControllerBase
   public function add_to_cart($nid) {
     \Drupal::service('page_cache_kill_switch')->trigger();
     $query = \Drupal::request()->query;
-    $utility = new Utility();
-    $config = $utility::cart_settings();
+    $config = Utility::cart_settings();
     $param['entitytype'] = $query->get('entitytype') ?  $query->get('entitytype') : "node";
     $param['quantity'] = $query->get('quantity') ? (is_numeric($query->get('quantity')) ? (int) $query->get('quantity') : 1) : 1;
-    $utility::add_to_cart($nid, $param);
+    Utility::add_to_cart($nid, $param);
     drupal_get_messages();
     $response = new \stdClass();
     $response->status = TRUE;
     $response->text = '<p class="messages messages--status">'.t($config->get('added_to_cart_message')).'</p>';
     $response->id = 'ajax-addtocart-message-'.$nid;
-    $response->block = $utility->get_cart_content();
+    $response->block = Utility::get_cart_content();
     return new JsonResponse($response);
   }
 

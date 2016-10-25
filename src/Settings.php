@@ -4,8 +4,8 @@ namespace Drupal\basiccart;
 
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
-use Drupal\Core\Url;
-use Drupal\Core\Link;
+use Drupal\Core\Url as Url;
+use Drupal\Core\Link as Link;
 
 abstract class Settings
 {
@@ -112,150 +112,7 @@ public static function _price_format() {
 }
 
 
- /**
-   * Returns the fields we need to create.
-   * 
-   * @return mixed
-   *   Key / Value pair of field name => field type. 
-   */
-  public static function  get_fields_config($type = null) {
 
-    $config = self::cart_settings();
-    $fields['bundle_types'] = $config->get('content_type');
-      foreach ($config->get('content_type') as $key => $value) {
-        if($value){
-          $bundles[$key] = $key;
-        }
-      }
-    $fields['bundle_types'] = $bundles;
-    if($type == self::FIELD_ORDERCONNECT) {
-
-     $fields['bundle_types'] = array('basiccart_connect' =>  'basiccart_connect'); 
-     $fields['fields'] =  array(
-                      'basiccart_contentoconnect' => array(
-                        'type' => 'entity_reference',
-                        'entity_type' => 'node',
-                        'bundle' => 'basiccart_connect',
-                        'title' => t('Basic Cart Content Connect'),
-                        'label' => t('Basic Cart Content Connect'),
-                        'required' => FALSE,
-                        'description' => t('Basic Cart content connect'),
-                        'settings' => array('handler' => 'default:node',
-                                            'handler_settings'=> array(
-                                                  "target_bundles" =>  $bundles,
-                                              ) 
-                                            )
-
-                          ),);
-    }
-    else {
-     $fields['fields'] =  array(
-                      'add_to_cart_price' => array(
-                        'type' => 'decimal',
-                        'entity_type' => 'node',
-                        'title' => t($config->get('price_label')),
-                        'label' => t($config->get('price_label')),
-                        'required' => FALSE,
-                        'description' => t('Please enter this item\'s price.'),
-                        'widget' => array('type' => 'number'),
-                        'formatter' => array('default'=> array(
-                                'label' => 'inline',
-                                'type' => 'number_decimal',
-                                'weight' => 11,
-                              ), 'search_result' =>  'default', 'teaser' => 'default') 
-                      ),
-                      'add_to_cart' => array(
-                        'type' => 'addtocart',
-                        'entity_type' => 'node',
-                        'title' => t($config->get('add_to_cart_button')),
-                        'label' => t($config->get('add_to_cart_button')),
-                        'required' => FALSE,
-                        'description' => '',
-                        'widget' => array('type' => 'addtocart'),
-                        'formatter' => array('default'=> array(
-                                'label' => 'hidden',
-                                'weight' => 11,
-                                'type' => $config->get('quantity_status') ? 'addtocartwithquantity' : 'addtocart',
-                              ), 'search_result' =>  array(
-                                'label' => 'hidden',
-                                'weight' => 11,
-                                'type' => 'addtocart',
-                              ), 'teaser' => array(
-                                'label' => 'hidden',
-                                'weight' => 11,
-                                'type' => 'addtocart',
-                              ),) 
-
-                      ), 
-                      );
-                 
-    }
-    return (object) $fields;
-  }
-
-  public static function create_fields($type = null) {
-
-    $fields = ($type == self::FIELD_ORDERCONNECT) ? self::get_fields_config(self::FIELD_ORDERCONNECT) : self::get_fields_config();
-    $view_modes = \Drupal::entityManager()->getViewModes('node');
-    foreach($fields->fields as $field_name => $config) {
-     $field_storage = FieldStorageConfig::loadByName($config['entity_type'], $field_name);
-     if(empty($field_storage)) {
-        FieldStorageConfig::create(array(
-            'field_name' => $field_name,
-            'entity_type' => $config['entity_type'],
-            'type' => $config['type'],
-          ))->save();
-     }
-    }
-    foreach($fields->bundle_types as  $bundle) {
-      foreach ($fields->fields as $field_name => $config) {
-        $config_array = array(
-                'field_name' =>  $field_name,
-                'entity_type' => $config['entity_type'],
-                'bundle' => $bundle,
-                'label' => $config['label'],
-                'required' => $config['required'],
-                
-              );
-
-        if(isset($config['settings'])) {
-          $config_array['settings'] = $config['settings'];
-        }
-        $field = FieldConfig::loadByName($config['entity_type'], $bundle, $field_name);
-        if(empty($field) && $bundle !== "" && !empty($bundle)) {
-                FieldConfig::create($config_array)->save();
-        }
-
-        if($bundle !== "" && !empty($bundle)) {
-          if(!empty($field)) {
-             $field->setLabel($config['label'])->save();
-             $field->setRequired($config['required'])->save();
-          }
-           if($config['widget']) {
-              entity_get_form_display($config['entity_type'], $bundle, 'default')
-              ->setComponent($field_name, $config['widget'])
-              ->save(); 
-           }
-           if($config['formatter']) { 
-             foreach ($config['formatter'] as $view => $formatter) {
-                if (isset($view_modes[$view]) || $view == "default") { 
-                  //$formatter['type'] = ($formatter['type'] == "addcartsearch") ? "addtocart"  : $formatter['type'];
-                   entity_get_display($config['entity_type'], $bundle, $view)
-                  ->setComponent($field_name, !is_array($formatter) ? $config['formatter']['default'] : $config['formatter']['default'])
-                  ->save();
-                }  
-             } 
-          } 
-        } 
-      }
-    }
-  } 
-
-
-
-  public static function order_connect_fields() {
-    self::create_fields(self::FIELD_ORDERCONNECT);
-  }
 
 	/**
 	 * Returns the final price for the shopping cart.
@@ -306,12 +163,12 @@ public static function _price_format() {
 	  return (object) $return;
 	}
 
-     public function get_cart_content() {
-    $Utility  = $this;
-    $config = $Utility->cart_settings();
-    $cart = static::get_cart();
+     public static function get_cart_content() {
+    //$Utility  = $this;
+    $config = self::cart_settings();
+    $cart = \Drupal\basiccart\Utility::get_cart();
     $quantity_enabled = $config->get('quantity_status');
-    $total_price = $Utility->get_total_price();
+    $total_price = self::get_total_price();
     $cart_cart = isset($cart['cart']) ? $cart['cart'] : array();
     $output = '';
  if (empty($cart_cart)){
@@ -337,19 +194,19 @@ else {
          }
          
          $output .='<div class="basiccart-cart-unit-price cell">';
-       $output .= isset($price_value[0]) ? '<strong>'.$Utility->price_format($price_value[0]['value']).'</strong>' : '';
+       $output .= isset($price_value[0]) ? '<strong>'.self::price_format($price_value[0]['value']).'</strong>' : '';
        $output .='</div>
         </div>';
     }
 
        $output .=  '<div class="basiccart-cart-total-price-contents row">
         <div class="basiccart-total-price cell">
-            '.t($config->get('total_price_label')).':<strong>'.$Utility->price_format($total_price->total).'</strong>
+            '.t($config->get('total_price_label')).':<strong>'.self::price_format($total_price->total).'</strong>
         </div>
       </div>';
         if (!empty ($config->get('vat_state'))) {
        $output .='<div class="basiccart-block-total-vat-contents row">
-          <div class="basiccart-total-vat cell">'.t('Total VAT').': <strong>'.$Utility->price_format($total_price->vat).'</strong></div>
+          <div class="basiccart-total-vat cell">'.t('Total VAT').': <strong>'.self::price_format($total_price->vat).'</strong></div>
         </div>';
         }
       $url = new Url('basiccart.cart');

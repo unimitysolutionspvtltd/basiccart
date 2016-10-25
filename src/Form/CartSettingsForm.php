@@ -266,6 +266,7 @@ class CartSettingsForm extends ConfigFormBase {
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
     $content_types = $this->config('basiccart.settings')->get('content_type');
+
     $this->config('basiccart.settings')
       ->set('cart_page_title', $form_state->getValue('basiccart_cart_page_title'))
       ->set('empty_cart',$form_state->getValue('basiccart_empty_cart'))
